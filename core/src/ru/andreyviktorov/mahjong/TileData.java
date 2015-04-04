@@ -1,8 +1,5 @@
 package ru.andreyviktorov.mahjong;
 
-/**
- * Created by andv on 31.03.15.
- */
 public class TileData {
     public float x;
     public float y;

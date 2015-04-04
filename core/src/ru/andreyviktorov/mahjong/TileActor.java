@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 public class TileActor extends Actor {
@@ -49,16 +50,19 @@ public class TileActor extends Actor {
                     if(PlayScreen.selected == null) {
                         PlayScreen.selected = passthis;
                         System.out.println("Выбрал");
+                        glowIt();
                     } else {
                         if(PlayScreen.selected.tiledata.randomId == passthis.tiledata.randomId) {
                             System.out.println("Ты только что на него тыкнул");
                         } else if(PlayScreen.selected.tile.suit == passthis.tile.suit && PlayScreen.selected.tile.number == passthis.tile.number) {
                             PlayScreen.field.remove(passthis);
                             PlayScreen.field.remove(PlayScreen.selected);
+                            resetGlow();
                             PlayScreen.selected = null;
                         } else {
                             PlayScreen.selected = passthis;
                             System.out.println("Не подошёл, заменил");
+                            glowIt();
                         }
                     }
                 } else {
@@ -73,6 +77,20 @@ public class TileActor extends Actor {
             }
         });
         setTouchable(Touchable.enabled);
+    }
+
+    public void glowIt() {
+        Image img = PlayScreen.glowimg;
+        // Еще одна магическая константа: 102/148
+        img.setSize(Gdx.graphics.getHeight() * 12 / 100 * 0.68918918918F, Gdx.graphics.getHeight() * 12 / 100);
+        float offsetx = (img.getWidth() - PlayScreen.TILE_WIDTH) / 2;
+        float offsety = (img.getHeight() - PlayScreen.TILE_HEIGHT) / 2;
+
+        img.setPosition(this.tiledata.x - offsetx, this.tiledata.y - offsety);
+    }
+
+    public void resetGlow() {
+        PlayScreen.glowimg.setPosition(-500, -500);
     }
 
     @Override
