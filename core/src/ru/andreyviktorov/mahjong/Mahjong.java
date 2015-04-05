@@ -16,10 +16,10 @@ public class Mahjong extends Game {
 	public void create () {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/ls-reg.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter param = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        param.size = Gdx.graphics.getHeight() / 18;
+        param.size = Gdx.graphics.getHeight() / 22;
         param.characters = FONT_CHARACTERS;
         font = generator.generateFont(param);
-        param.size = Gdx.graphics.getHeight() / 20;
+        param.size = Gdx.graphics.getHeight() / 24;
         levels = generator.generateFont(param);
         font.setColor(Color.WHITE);
         levels.setColor(Color.WHITE);

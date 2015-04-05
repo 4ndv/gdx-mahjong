@@ -90,7 +90,8 @@ public class PlayScreen implements Screen {
         Label.LabelStyle ls = new Label.LabelStyle();
         ls.font = game.levels;
         remainLabel = new Label("Осталось тайлов: 144", ls);
-        remainLabel.setPosition(Gdx.graphics.getWidth()/100, Gdx.graphics.getHeight() - remainLabel.getHeight() - (remainLabel.getHeight() / 3));
+        remainLabel.setPosition(Gdx.graphics.getWidth()/100,
+                Gdx.graphics.getHeight() - Utils.getCenteredHeight(barheight, remainLabel.getHeight()));
 
         back.addActor(remainLabel);
 
