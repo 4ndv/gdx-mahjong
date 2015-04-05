@@ -15,10 +15,12 @@ public class TileActor extends Actor {
     public TileData tiledata;
     private Sprite sprite;
     private Texture img;
+    public int randomId = 0;
 
     public TileActor(Tile t, TileData td) {
         tile = t;
         tiledata = td;
+        this.randomId = (int)Math.floor((Math.random() * 99999999) + 10000000);
 
         // Подгружаем подходящую текстуру
         // Что бы не потерять: однострочник для отличной обрезки:
@@ -33,9 +35,8 @@ public class TileActor extends Actor {
         sprite = new Sprite(img);
 
         // Магическая константа: отношение ширины к высоте, 82/102 = 0.640625F
-        sprite.setSize(Gdx.graphics.getHeight() * 10 / 100 * 0.640625F, Gdx.graphics.getHeight() * 10 / 100);
+        sprite.setSize(Gdx.graphics.getHeight() * PlayScreen.gamedata.scaleModificator / 100 * 0.640625F, Gdx.graphics.getHeight() * PlayScreen.gamedata.scaleModificator / 100);
         PlayScreen.TILE_WIDTH = sprite.getWidth();
-        System.out.println(sprite.getWidth());
         PlayScreen.TILE_HEIGHT = sprite.getHeight();
 
         final TileActor passthis = this;
@@ -46,27 +47,25 @@ public class TileActor extends Actor {
                 //PlayScreen.field.layers.get(tiledata.layer).data[tiledata.datax][tiledata.datay] = null;
                 //passthis.remove();
                 //System.out.println("Пынг!");
-                if(PlayScreen.field.canRemove(tiledata.layer, tiledata.datax, tiledata.datay)) {
-                    if(PlayScreen.selected == null) {
-                        PlayScreen.selected = passthis;
-                        System.out.println("Выбрал");
+                if(PlayScreen.gamedata.field.canRemove(tiledata.layer, tiledata.datax, tiledata.datay)) {
+                    if(PlayScreen.gamedata.selected == null) {
+                        PlayScreen.gamedata.selected = passthis;
                         glowIt();
                     } else {
-                        if(PlayScreen.selected.tiledata.randomId == passthis.tiledata.randomId) {
-                            System.out.println("Ты только что на него тыкнул");
-                        } else if(PlayScreen.selected.tile.suit == passthis.tile.suit && PlayScreen.selected.tile.number == passthis.tile.number) {
-                            PlayScreen.field.remove(passthis);
-                            PlayScreen.field.remove(PlayScreen.selected);
-                            resetGlow();
-                            PlayScreen.selected = null;
+                        if(PlayScreen.gamedata.selected.randomId == passthis.randomId) {
+                        } else if(PlayScreen.gamedata.selected.tile.suit == passthis.tile.suit && PlayScreen.gamedata.selected.tile.number == passthis.tile.number) {
+                            removePair();
+                        } else if (PlayScreen.gamedata.selected.tile.suit == Tile.Suit.Season && passthis.tile.suit == Tile.Suit.Season) {
+                            removePair();
+                        } else if (PlayScreen.gamedata.selected.tile.suit == Tile.Suit.Flower && passthis.tile.suit == Tile.Suit.Flower) {
+                            removePair();
                         } else {
-                            PlayScreen.selected = passthis;
-                            System.out.println("Не подошёл, заменил");
+                            PlayScreen.gamedata.selected = passthis;
                             glowIt();
                         }
                     }
                 } else {
-                    System.out.println("Низя убрать");
+
                 }
                 return true;
             }
@@ -79,10 +78,19 @@ public class TileActor extends Actor {
         setTouchable(Touchable.enabled);
     }
 
+    public void removePair() {
+        PlayScreen.gamedata.field.remove(this);
+        PlayScreen.gamedata.field.remove(PlayScreen.gamedata.selected);
+        resetGlow();
+        PlayScreen.gamedata.selected = null;
+        PlayScreen.gamedata.remainingTiles -= 2;
+        PlayScreen.remainLabel.setText("Осталось тайлов: " + PlayScreen.gamedata.remainingTiles);
+    }
+
     public void glowIt() {
         Image img = PlayScreen.glowimg;
         // Еще одна магическая константа: 102/148
-        img.setSize(Gdx.graphics.getHeight() * 12 / 100 * 0.68918918918F, Gdx.graphics.getHeight() * 12 / 100);
+        img.setSize(Gdx.graphics.getHeight() * (PlayScreen.gamedata.scaleModificator + 2) / 100 * 0.68918918918F, Gdx.graphics.getHeight() * (PlayScreen.gamedata.scaleModificator + 2) / 100);
         float offsetx = (img.getWidth() - PlayScreen.TILE_WIDTH) / 2;
         float offsety = (img.getHeight() - PlayScreen.TILE_HEIGHT) / 2;
 
@@ -91,6 +99,7 @@ public class TileActor extends Actor {
 
     public void resetGlow() {
         PlayScreen.glowimg.setPosition(-500, -500);
+        PlayScreen.gamedata.selected = null;
     }
 
     @Override

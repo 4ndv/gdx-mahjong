@@ -122,7 +122,7 @@ public class Field {
     }
 
     public void remove(TileActor actor) {
-        PlayScreen.field.layers.get(actor.tiledata.layer).data[actor.tiledata.datax][actor.tiledata.datay] = null;
+        PlayScreen.gamedata.field.layers.get(actor.tiledata.layer).data[actor.tiledata.datax][actor.tiledata.datay] = null;
         PlayScreen.shadowimgs[actor.tiledata.datax][actor.tiledata.datay][actor.tiledata.layer].remove();
         PlayScreen.shadowimgs[actor.tiledata.datax][actor.tiledata.datay][actor.tiledata.layer] = null;
         actor.remove();
