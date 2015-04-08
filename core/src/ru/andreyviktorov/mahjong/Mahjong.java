@@ -14,6 +14,8 @@ import java.util.Map;
 public class Mahjong extends Game {
     private static final String FONT_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.:;,{}\"´`'<>";
     Map<String, BitmapFont> fontsHash = new HashMap<String, BitmapFont>();
+    public float tenth;
+    public float twelveth;
 
 
 	@Override
@@ -21,6 +23,9 @@ public class Mahjong extends Game {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/ls-reg.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter param = new FreeTypeFontGenerator.FreeTypeFontParameter();
         BitmapFont font;
+
+        this.tenth = Gdx.graphics.getHeight() / 10;
+        this.twelveth = Gdx.graphics.getHeight() / 20;
 
         param.size = Gdx.graphics.getHeight() / 22;
         param.characters = FONT_CHARACTERS;
@@ -54,7 +59,7 @@ public class Mahjong extends Game {
         fontsHash.put("small", font);
 
         generator.dispose();
-        setScreen(new PlayScreen(this));
+        setScreen(new MenuScreen(this));
 	}
 
 	@Override

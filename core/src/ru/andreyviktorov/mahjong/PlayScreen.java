@@ -5,20 +5,27 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.Align;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -35,14 +42,17 @@ public class PlayScreen implements Screen {
     public static float TILE_HEIGHT;
     public static GameData gamedata;
     public static List<List<Image>> shadows = new ArrayList();
-    public Texture shadowtexture;
-    public Texture glowtexture;
+    public static Texture shadowtexture;
+    public static Texture glowtexture;
     public static Image glowimg;
     public static Image[][][] shadowimgs;
     private static List<String> backgrounds;
 
     public static Group back;
     public static Group fore;
+
+    public static TileActor previousOne;
+    public static TileActor previousTwo;
 
     public static Label remainLabel;
     public static Label availableLabel;
@@ -54,11 +64,10 @@ public class PlayScreen implements Screen {
 
         // TODO: сделать загрузку геймдаты из сейва
         gamedata = new GameData();
-        gamedata.scaleModificator = Generator.getFigureHeight(Generator.Figure.Pyramid) - 6.5F;
+        gamedata.scaleModificator = Field.getFigureHeight(Field.Figure.Pyramid) - 6.5F;
         System.out.println("СМ:" + gamedata.scaleModificator);
 
-        Generator gen = new Generator();
-        gamedata.field = gen.generateFigure(Generator.Figure.Pyramid);
+        gamedata.field = new Field();
 
         glowtexture = new Texture(Gdx.files.internal("data/tiles/TileSelected.png"));
         glowimg = new Image(glowtexture);
@@ -85,7 +94,12 @@ public class PlayScreen implements Screen {
 
         Collections.shuffle(backgrounds);
 
-        gamedata.background = new Image(new Texture(Gdx.files.internal(backgrounds.get(0))));
+        float koeff_bg = 1920F/1080F;
+        Texture bg_img = new Texture(Gdx.files.internal(backgrounds.get(0)));
+        bg_img.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        gamedata.background = new Image(bg_img);
+        gamedata.background.setWidth(Gdx.graphics.getWidth());
+        gamedata.background.setHeight(Gdx.graphics.getWidth() / koeff_bg);
 
         back.addActor(gamedata.background);
 
@@ -112,21 +126,81 @@ public class PlayScreen implements Screen {
         back.addActor(remainLabel);
         back.addActor(availableLabel);
 
+        Table tbl = new Table();
+        tbl.setWidth(Gdx.graphics.getWidth());
+
+        Texture uitex = new Texture(Gdx.files.internal("data/uihalf.png"));
+        uitex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        NinePatch np = new NinePatch(uitex, 8, 8, 8, 8);
+        final NinePatchDrawable npd_50 = new NinePatchDrawable(np);
+
+        Texture uitex2 = new Texture(Gdx.files.internal("data/ui75.png"));
+        uitex2.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        NinePatch np2 = new NinePatch(uitex2, 8, 8, 8, 8);
+        final NinePatchDrawable npd_75 = new NinePatchDrawable(np2);
+
+        Texture uitex3 = new Texture(Gdx.files.internal("data/ui90.png"));
+        uitex3.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        NinePatch np3 = new NinePatch(uitex2, 8, 8, 8, 8);
+        final NinePatchDrawable npd_90 = new NinePatchDrawable(np3);
+
         // TODO: сделать нормальный стиль для диалога
-        TextureRegion tr = new TextureRegion(new Texture(Gdx.files.internal("data/ui.png")));
-        TextureRegionDrawable WTFBLYAT = new TextureRegionDrawable(tr);
-        TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle(WTFBLYAT, WTFBLYAT, WTFBLYAT, game.fontsHash.get("small"));
+        final TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle(npd_50, npd_75, npd_50, game.fontsHash.get("small"));
 
-        Dialog dia = new Dialog("Правила игры", new WindowStyle(game.fontsHash.get("semi-medium"), Color.WHITE, WTFBLYAT));
-        dia.pad(50, 10, 10, 10);
-        dia.text("Добро пожаловать в пасьянс маджонг!\r\nКраткие правила игры:\r\nНужно убрать с поля все парные фишки.\r\nФишки делятся на два типа: обычные и джокеры.\r\nДжокеры - это фишки с цифрой в левом верхнем углу, и убираются опираясь на картинку в центре.\r\n\r\nФишки не могут быть убраны если:\r\n1. Над ней есть другая фишка\r\n2. Слева и справа от неё есть другие фишки", new Label.LabelStyle(game.fontsHash.get("small"), Color.WHITE));
-        dia.button("OK", true, tbs);
 
-        dia.show(stage);
 
         // TODO: сделать нормальный стиль для кнопки
         TextButton shuffleButton = new TextButton("Перемешать", tbs);
-        back.addActor(shuffleButton);
+        TextButton helpButton = new TextButton("Помощь", tbs);
+        helpButton.addListener(new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                Dialog dia = new Dialog("Правила игры", new WindowStyle(game.fontsHash.get("semi-medium"), Color.WHITE, npd_90));
+                dia.pad(50, 10, 10, 10);
+                dia.text("Добро пожаловать в пасьянс маджонг!\r\nКраткие правила игры:\r\nНужно убрать с поля все парные фишки.\r\nФишки делятся на два типа: обычные и джокеры.\r\nДжокеры - это фишки с цифрой в левом верхнем углу, и убираются опираясь на картинку в центре.\r\n\r\nФишки не могут быть убраны если:\r\n1. Над ней есть другая фишка\r\n2. Слева и справа от неё есть другие фишки", new Label.LabelStyle(game.fontsHash.get("small"), Color.WHITE));
+                dia.button("OK", true, tbs);
+
+                dia.show(stage);
+                return true;
+            }
+        });
+        TextButton cancelButton = new TextButton("Отменить", tbs);
+        cancelButton.addListener(new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if(PlayScreen.previousOne != null && PlayScreen.previousTwo != null) {
+                    PlayScreen.gamedata.field.layers.get(PlayScreen.previousOne.tiledata.layer).data[PlayScreen.previousOne.tiledata.datax][PlayScreen.previousOne.tiledata.datay] = PlayScreen.previousOne;
+                    PlayScreen.gamedata.field.layers.get(PlayScreen.previousTwo.tiledata.layer).data[PlayScreen.previousTwo.tiledata.datax][PlayScreen.previousTwo.tiledata.datay] = PlayScreen.previousTwo;
+                    PlayScreen.previousOne = null;
+                    PlayScreen.previousTwo = null;
+                    rebuildField();
+                }
+                return true;
+            }
+        });
+        TextButton menuButton = new TextButton("Меню", tbs);
+
+        //tbl.row().width(Gdx.graphics.getWidth());
+        tbl.setDebug(true);
+        tbl.align(Align.bottomLeft);
+        tbl.add(shuffleButton).pad(5);
+        tbl.add(helpButton).pad(5);
+        tbl.add().expandX();
+        tbl.add(cancelButton).pad(5);
+        tbl.add(menuButton).pad(5);
+        stage.addActor(tbl);
+
+        //tbl.setX(0);
+        //tbl.setY(tbl.getHeight());
+
+        rebuildField();
+
+        Gdx.input.setInputProcessor(stage);
+        Gdx.input.setCatchBackKey(true);
+    }
+
+    public static void rebuildField() {
+        fore.clear();
 
         float fieldWidth;
         float fieldHeight;
@@ -164,11 +238,11 @@ public class PlayScreen implements Screen {
                         layer.data[i][j].tiledata.datax = i;
                         layer.data[i][j].tiledata.datay = j;
                         layer.data[i][j].tiledata.layer = layernumber;
-                        
+
                         layer.data[i][j].tiledata.x = fieldPosX + TILE_WIDTH * i/2;
                         layer.data[i][j].tiledata.y = fieldPosY + TILE_HEIGHT * j/2 - g_offset_y;
 
-                        Image img = new Image(shadowtexture);
+                        Image img = new Image(PlayScreen.shadowtexture);
                         // Еще одна магическая константа: 102/148
                         img.setSize(Gdx.graphics.getHeight() * 12 / 100 * 0.68918918918F, Gdx.graphics.getHeight() * 12 / 100);
                         float offsetx = (img.getWidth() - TILE_WIDTH) / 2;
@@ -197,13 +271,10 @@ public class PlayScreen implements Screen {
             System.out.println("Finished layer " + layernumber);
             layernumber++;
             g_offset_y += TILE_HEIGHT/5.8;
+
+            // Must be on top of any else
+            fore.addActor(glowimg);
         }
-
-        // Must be on top of any else
-        fore.addActor(glowimg);
-
-        Gdx.input.setInputProcessor(stage);
-        Gdx.input.setCatchBackKey(true);
     }
 
     public static int countAvailablePairs() {

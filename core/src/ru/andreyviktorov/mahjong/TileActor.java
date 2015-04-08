@@ -79,6 +79,8 @@ public class TileActor extends Actor {
     }
 
     public void removePair() {
+        PlayScreen.previousOne = this;
+        PlayScreen.previousTwo = PlayScreen.gamedata.selected;
         PlayScreen.gamedata.field.remove(this);
         PlayScreen.gamedata.field.remove(PlayScreen.gamedata.selected);
         resetGlow();
