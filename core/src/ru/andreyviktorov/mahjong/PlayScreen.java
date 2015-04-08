@@ -2,15 +2,24 @@ package ru.andreyviktorov.mahjong;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.ArrayList;
@@ -36,6 +45,7 @@ public class PlayScreen implements Screen {
     public static Group fore;
 
     public static Label remainLabel;
+    public static Label availableLabel;
 
     public PlayScreen (final Mahjong gameref) {
         game = gameref;
@@ -88,12 +98,35 @@ public class PlayScreen implements Screen {
         back.addActor(topbar);
 
         Label.LabelStyle ls = new Label.LabelStyle();
-        ls.font = game.levels;
-        remainLabel = new Label("Осталось тайлов: 144", ls);
-        remainLabel.setPosition(Gdx.graphics.getWidth()/100,
+        ls.font = game.fontsHash.get("semi-big");
+        remainLabel = new Label("Осталось фишек: 144", ls);
+        remainLabel.setPosition(Gdx.graphics.getWidth()/48,
                 Gdx.graphics.getHeight() - Utils.getCenteredHeight(barheight, remainLabel.getHeight()));
 
+        availableLabel = new Label("Возможных ходов: " + countAvailablePairs(), ls);
+
+        float apos = Gdx.graphics.getWidth() - Gdx.graphics.getWidth()/50 - availableLabel.getWidth();
+
+        availableLabel.setPosition(apos, Gdx.graphics.getHeight() - Utils.getCenteredHeight(barheight, availableLabel.getHeight()));
+
         back.addActor(remainLabel);
+        back.addActor(availableLabel);
+
+        // TODO: сделать нормальный стиль для диалога
+        TextureRegion tr = new TextureRegion(new Texture(Gdx.files.internal("data/ui.png")));
+        TextureRegionDrawable WTFBLYAT = new TextureRegionDrawable(tr);
+        TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle(WTFBLYAT, WTFBLYAT, WTFBLYAT, game.fontsHash.get("small"));
+
+        Dialog dia = new Dialog("Правила игры", new WindowStyle(game.fontsHash.get("semi-medium"), Color.WHITE, WTFBLYAT));
+        dia.pad(50, 10, 10, 10);
+        dia.text("Добро пожаловать в пасьянс маджонг!\r\nКраткие правила игры:\r\nНужно убрать с поля все парные фишки.\r\nФишки делятся на два типа: обычные и джокеры.\r\nДжокеры - это фишки с цифрой в левом верхнем углу, и убираются опираясь на картинку в центре.\r\n\r\nФишки не могут быть убраны если:\r\n1. Над ней есть другая фишка\r\n2. Слева и справа от неё есть другие фишки", new Label.LabelStyle(game.fontsHash.get("small"), Color.WHITE));
+        dia.button("OK", true, tbs);
+
+        dia.show(stage);
+
+        // TODO: сделать нормальный стиль для кнопки
+        TextButton shuffleButton = new TextButton("Перемешать", tbs);
+        back.addActor(shuffleButton);
 
         float fieldWidth;
         float fieldHeight;
@@ -171,6 +204,36 @@ public class PlayScreen implements Screen {
 
         Gdx.input.setInputProcessor(stage);
         Gdx.input.setCatchBackKey(true);
+    }
+
+    public static int countAvailablePairs() {
+        List<TileActor> avalist = new ArrayList();
+        Field f = PlayScreen.gamedata.field;
+        int n = 0;
+        for(Layer l : f.layers) {
+            for(int i = 0; i<f.getWidth() + 1; i++) {
+                for(int j = 0; j<f.getHeight() + 1; j++) {
+                    if(l.data[i][j] != null) {
+                        if(f.canRemove(n, i, j)) {
+                            avalist.add(l.data[i][j]);
+                        }
+                    }
+                }
+            }
+            n++;
+        }
+
+        int c = 0;
+
+        for(TileActor one : avalist) {
+            for(TileActor two : avalist) {
+                if((one.randomId != two.randomId) && ((one.tile.suit == two.tile.suit && one.tile.number == two.tile.number) || (one.tile.suit == two.tile.suit && one.tile.suit == Tile.Suit.Season) || (one.tile.suit == two.tile.suit && one.tile.suit == Tile.Suit.Flower))) {
+                    c++;
+                }
+            }
+        }
+
+        return c/2;
     }
 
     @Override

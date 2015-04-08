@@ -84,7 +84,8 @@ public class TileActor extends Actor {
         resetGlow();
         PlayScreen.gamedata.selected = null;
         PlayScreen.gamedata.remainingTiles -= 2;
-        PlayScreen.remainLabel.setText("Осталось тайлов: " + PlayScreen.gamedata.remainingTiles);
+        PlayScreen.remainLabel.setText("Осталось фишек: " + PlayScreen.gamedata.remainingTiles);
+        PlayScreen.availableLabel.setText("Возможных ходов: " + PlayScreen.countAvailablePairs());
     }
 
     public void glowIt() {
