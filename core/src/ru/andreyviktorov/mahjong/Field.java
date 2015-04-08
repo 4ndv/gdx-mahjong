@@ -8,6 +8,7 @@ import java.util.List;
 public class Field {
     private int width;
     private int height;
+    public Figure figure;
     public List<Layer> layers = new ArrayList();
     private LinkedList<TileActor> tiles;
     public Field(int w, int h){
@@ -18,8 +19,9 @@ public class Field {
     public Field() {
         this.width = 30;
         this.height = 16;
+        this.figure = Figure.Pyramid;
         this.generateTiles();
-        this.generateFigure(Figure.Pyramid);
+        this.generateFigure(this.figure);
     }
 
     public int getWidth() {
@@ -199,6 +201,24 @@ public class Field {
         } else {
             return null;
         }
+    }
+
+    public void shuffleField() {
+        LinkedList<TileActor> newlist = new LinkedList();
+        for(Layer l : this.layers) {
+            for(TileActor[] act_up : l.data) {
+                for(TileActor act : act_up) {
+                    if(act != null) {
+                        newlist.add(act);
+                    }
+                }
+            }
+        }
+
+        this.tiles = newlist;
+        this.generateFigure(this.figure);
+
+        PlayScreen.rebuildField();
     }
 
     public static int getFigureHeight(Figure fig) {

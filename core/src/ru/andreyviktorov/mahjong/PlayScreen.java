@@ -151,6 +151,13 @@ public class PlayScreen implements Screen {
 
         // TODO: сделать нормальный стиль для кнопки
         TextButton shuffleButton = new TextButton("Перемешать", tbs);
+        shuffleButton.addListener(new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                PlayScreen.gamedata.field.shuffleField();
+                return true;
+            }
+        });
         TextButton helpButton = new TextButton("Помощь", tbs);
         helpButton.addListener(new ClickListener() {
             @Override
@@ -180,8 +187,7 @@ public class PlayScreen implements Screen {
         });
         TextButton menuButton = new TextButton("Меню", tbs);
 
-        //tbl.row().width(Gdx.graphics.getWidth());
-        tbl.setDebug(true);
+        //tbl.setDebug(true);
         tbl.align(Align.bottomLeft);
         tbl.add(shuffleButton).pad(5);
         tbl.add(helpButton).pad(5);
@@ -189,9 +195,6 @@ public class PlayScreen implements Screen {
         tbl.add(cancelButton).pad(5);
         tbl.add(menuButton).pad(5);
         stage.addActor(tbl);
-
-        //tbl.setX(0);
-        //tbl.setY(tbl.getHeight());
 
         rebuildField();
 
