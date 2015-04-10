@@ -6,4 +6,5 @@ public class TileData {
     public int datax;
     public int datay;
     public int layer;
+    public int tilesinrow;
 }

@@ -6,27 +6,18 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.ArrayList;
@@ -57,17 +48,18 @@ public class PlayScreen implements Screen {
     public static Label remainLabel;
     public static Label availableLabel;
 
-    public PlayScreen (final Mahjong gameref) {
+    public PlayScreen (final Mahjong gameref, final Field.Figure figure) {
         game = gameref;
 
         stage = new Stage(new ScreenViewport());
 
         // TODO: сделать загрузку геймдаты из сейва
         gamedata = new GameData();
-        gamedata.scaleModificator = Field.getFigureHeight(Field.Figure.Pyramid) - 6.5F;
+        gamedata.scaleModificator = Field.getFigureHeight(figure) - 6.5F;
         System.out.println("СМ:" + gamedata.scaleModificator);
 
-        gamedata.field = new Field();
+        gamedata.field = new Field(figure);
+        gamedata.remainingTiles = gamedata.field.getMaxTilesCount();
 
         glowtexture = new Texture(Gdx.files.internal("data/tiles/TileSelected.png"));
         glowimg = new Image(glowtexture);
@@ -100,6 +92,9 @@ public class PlayScreen implements Screen {
         gamedata.background = new Image(bg_img);
         gamedata.background.setWidth(Gdx.graphics.getWidth());
         gamedata.background.setHeight(Gdx.graphics.getWidth() / koeff_bg);
+        if (Gdx.graphics.getWidth() / koeff_bg < Gdx.graphics.getHeight()) {
+            gamedata.background.setHeight(Gdx.graphics.getHeight());
+        }
 
         back.addActor(gamedata.background);
 
@@ -113,7 +108,7 @@ public class PlayScreen implements Screen {
 
         Label.LabelStyle ls = new Label.LabelStyle();
         ls.font = game.fontsHash.get("semi-big");
-        remainLabel = new Label("Осталось фишек: 144", ls);
+        remainLabel = new Label("Осталось фишек: " + gamedata.field.getMaxTilesCount(), ls);
         remainLabel.setPosition(Gdx.graphics.getWidth()/48,
                 Gdx.graphics.getHeight() - Utils.getCenteredHeight(barheight, remainLabel.getHeight()));
 
@@ -147,14 +142,13 @@ public class PlayScreen implements Screen {
         // TODO: сделать нормальный стиль для диалога
         final TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle(npd_50, npd_75, npd_50, game.fontsHash.get("small"));
 
-
-
         // TODO: сделать нормальный стиль для кнопки
         TextButton shuffleButton = new TextButton("Перемешать", tbs);
         shuffleButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 PlayScreen.gamedata.field.shuffleField();
+                clearSelection();
                 return true;
             }
         });
@@ -181,6 +175,8 @@ public class PlayScreen implements Screen {
                     PlayScreen.previousOne = null;
                     PlayScreen.previousTwo = null;
                     rebuildField();
+                    recountMoves();
+                    clearSelection();
                 }
                 return true;
             }
@@ -200,6 +196,10 @@ public class PlayScreen implements Screen {
 
         Gdx.input.setInputProcessor(stage);
         Gdx.input.setCatchBackKey(true);
+    }
+
+    public static void recountMoves() {
+        PlayScreen.availableLabel.setText("Возможных ходов: " + PlayScreen.countAvailablePairs());
     }
 
     public static void rebuildField() {
@@ -247,7 +247,7 @@ public class PlayScreen implements Screen {
 
                         Image img = new Image(PlayScreen.shadowtexture);
                         // Еще одна магическая константа: 102/148
-                        img.setSize(Gdx.graphics.getHeight() * 12 / 100 * 0.68918918918F, Gdx.graphics.getHeight() * 12 / 100);
+                        img.setSize(TILE_WIDTH * 1.3F, TILE_HEIGHT * 1.3F);
                         float offsetx = (img.getWidth() - TILE_WIDTH) / 2;
                         float offsety = (img.getHeight() - TILE_HEIGHT) / 2;
 
@@ -278,6 +278,11 @@ public class PlayScreen implements Screen {
             // Must be on top of any else
             fore.addActor(glowimg);
         }
+    }
+
+    public static void clearSelection() {
+        PlayScreen.glowimg.setPosition(-500, -500);
+        PlayScreen.gamedata.selected = null;
     }
 
     public static int countAvailablePairs() {

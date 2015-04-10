@@ -35,7 +35,11 @@ public class TileActor extends Actor {
         sprite = new Sprite(img);
 
         // Магическая константа: отношение ширины к высоте, 82/102 = 0.640625F
-        sprite.setSize(Gdx.graphics.getHeight() * PlayScreen.gamedata.scaleModificator / 100 * 0.640625F, Gdx.graphics.getHeight() * PlayScreen.gamedata.scaleModificator / 100);
+        //sprite.setSize(Gdx.graphics.getHeight() * PlayScreen.gamedata.scaleModificator / 100 * 0.640625F, Gdx.graphics.getHeight() * PlayScreen.gamedata.scaleModificator / 100);
+        float baseheight = Gdx.graphics.getHeight();
+        float usableheight = baseheight / 10 * 7.5F;
+        float tileheight = usableheight / (tiledata.tilesinrow/2);
+        sprite.setSize(tileheight * 0.640625F, tileheight);
         PlayScreen.TILE_WIDTH = sprite.getWidth();
         PlayScreen.TILE_HEIGHT = sprite.getHeight();
 
@@ -44,6 +48,7 @@ public class TileActor extends Actor {
         addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                //System.out.println("Ткнул на: слой: " + tiledata.layer + " x: " + tiledata.datax + " y: " + tiledata.datay);
                 //PlayScreen.field.layers.get(tiledata.layer).data[tiledata.datax][tiledata.datay] = null;
                 //passthis.remove();
                 //System.out.println("Пынг!");
@@ -83,26 +88,22 @@ public class TileActor extends Actor {
         PlayScreen.previousTwo = PlayScreen.gamedata.selected;
         PlayScreen.gamedata.field.remove(this);
         PlayScreen.gamedata.field.remove(PlayScreen.gamedata.selected);
-        resetGlow();
+        PlayScreen.clearSelection();
         PlayScreen.gamedata.selected = null;
         PlayScreen.gamedata.remainingTiles -= 2;
         PlayScreen.remainLabel.setText("Осталось фишек: " + PlayScreen.gamedata.remainingTiles);
-        PlayScreen.availableLabel.setText("Возможных ходов: " + PlayScreen.countAvailablePairs());
+        PlayScreen.recountMoves();
     }
 
     public void glowIt() {
         Image img = PlayScreen.glowimg;
         // Еще одна магическая константа: 102/148
-        img.setSize(Gdx.graphics.getHeight() * (PlayScreen.gamedata.scaleModificator + 2) / 100 * 0.68918918918F, Gdx.graphics.getHeight() * (PlayScreen.gamedata.scaleModificator + 2) / 100);
+        //img.setSize(Gdx.graphics.getHeight() * (PlayScreen.gamedata.scaleModificator + 2) / 100 * 0.68918918918F, Gdx.graphics.getHeight() * (PlayScreen.gamedata.scaleModificator + 2) / 100);
+        img.setSize(PlayScreen.TILE_WIDTH * 1.2F, PlayScreen.TILE_HEIGHT * 1.2F);
         float offsetx = (img.getWidth() - PlayScreen.TILE_WIDTH) / 2;
         float offsety = (img.getHeight() - PlayScreen.TILE_HEIGHT) / 2;
 
         img.setPosition(this.tiledata.x - offsetx, this.tiledata.y - offsety);
-    }
-
-    public void resetGlow() {
-        PlayScreen.glowimg.setPosition(-500, -500);
-        PlayScreen.gamedata.selected = null;
     }
 
     @Override

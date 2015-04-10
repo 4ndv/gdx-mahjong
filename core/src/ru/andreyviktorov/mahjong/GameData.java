@@ -7,5 +7,5 @@ public class GameData {
     public float scaleModificator;
     public TileActor selected;
     public Image background;
-    public int remainingTiles = 144;
+    public int remainingTiles;
 }

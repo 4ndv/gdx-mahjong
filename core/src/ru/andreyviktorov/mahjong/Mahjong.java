@@ -27,32 +27,32 @@ public class Mahjong extends Game {
         this.tenth = Gdx.graphics.getHeight() / 10;
         this.twelveth = Gdx.graphics.getHeight() / 20;
 
-        param.size = Gdx.graphics.getHeight() / 22;
+        param.size = Math.round(Gdx.graphics.getHeight() / 22);
         param.characters = FONT_CHARACTERS;
         font = generator.generateFont(param);
         font.setColor(Color.WHITE);
 
         fontsHash.put("big", font);
 
-        param.size = Gdx.graphics.getHeight() / 24;
+        param.size = Math.round(Gdx.graphics.getHeight() / 24);
         font = generator.generateFont(param);
         font.setColor(Color.WHITE);
 
         fontsHash.put("semi-big", font);
 
-        param.size = Gdx.graphics.getHeight() / 30;
+        param.size = Math.round(Gdx.graphics.getHeight() / 30);
         font = generator.generateFont(param);
         font.setColor(Color.WHITE);
 
         fontsHash.put("medium", font);
 
-        param.size = Gdx.graphics.getHeight() / 35;
+        param.size = Math.round(Gdx.graphics.getHeight() / 35);
         font = generator.generateFont(param);
         font.setColor(Color.WHITE);
 
         fontsHash.put("semi-medium", font);
 
-        param.size = Gdx.graphics.getHeight() / 40;
+        param.size = Math.round(Gdx.graphics.getHeight() / 40);
         font = generator.generateFont(param);
         font.setColor(Color.WHITE);
 
