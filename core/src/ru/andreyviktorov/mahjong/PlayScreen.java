@@ -82,22 +82,9 @@ public class PlayScreen implements Screen {
 
         backgrounds.add("data/backgrounds/geometry.png");
         backgrounds.add("data/backgrounds/geometry2.png");
-        //backgrounds.add("data/backgrounds/sativa.png");
         backgrounds.add("data/backgrounds/photography.png");
 
         Collections.shuffle(backgrounds);
-
-        //float koeff_bg = 1920F/1080F;
-        //Texture bg_img = new Texture(Gdx.files.internal(backgrounds.get(0)));
-        //bg_img.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        //gamedata.background = new Image(bg_img);
-        //gamedata.background.setWidth(Gdx.graphics.getWidth());
-        //gamedata.background.setHeight(Gdx.graphics.getWidth() / koeff_bg);
-        //if (Gdx.graphics.getWidth() / koeff_bg < Gdx.graphics.getHeight()) {
-        //    gamedata.background.setHeight(Gdx.graphics.getHeight());
-        //}
-
-        //back.addActor(gamedata.background);
 
         Texture bg_img = new Texture(Gdx.files.internal(backgrounds.get(0)));
         int w_count = (int)Math.ceil((double)Gdx.graphics.getWidth() / (double)bg_img.getWidth());
@@ -112,49 +99,20 @@ public class PlayScreen implements Screen {
             }
         }
 
-        /*Image topbar = new Image(new Texture(Gdx.files.internal("data/ui.png")));
-        topbar.setColor(0,0,0,0.3F);
-        float barheight = Gdx.graphics.getHeight()/10;
-        topbar.setSize(Gdx.graphics.getWidth(), barheight);
-        topbar.setPosition(0, Gdx.graphics.getHeight() - barheight);
-
-        back.addActor(topbar);*/
-
         Label.LabelStyle ls = new Label.LabelStyle();
         ls.font = game.fontsHash.get("semi-big");
         ls.fontColor = Color.DARK_GRAY;
         remainLabel = new Label("Осталось фишек: " + gamedata.field.getMaxTilesCount(), ls);
         remainLabel.setPosition(game.twentyth/2, Gdx.graphics.getHeight() - remainLabel.getHeight() - game.twentyth/4);
-        //remainLabel.setPosition(Gdx.graphics.getWidth()/48,
-        //        Gdx.graphics.getHeight() - Utils.getCenteredHeight(barheight, remainLabel.getHeight()));
 
         availableLabel = new Label("Возможных ходов: " + countAvailablePairs(), ls);
         availableLabel.setPosition(Gdx.graphics.getWidth() - availableLabel.getWidth() - game.twentyth/2, Gdx.graphics.getHeight() - availableLabel.getHeight() - game.twentyth/4);
-
-        //float apos = Gdx.graphics.getWidth() - Gdx.graphics.getWidth()/50 - availableLabel.getWidth();
-
-        //availableLabel.setPosition(apos, Gdx.graphics.getHeight() - Utils.getCenteredHeight(barheight, availableLabel.getHeight()));
 
         back.addActor(remainLabel);
         back.addActor(availableLabel);
 
         Table tbl = new Table();
         tbl.setWidth(Gdx.graphics.getWidth());
-
-        /*Texture uitex = new Texture(Gdx.files.internal("data/uihalf.png"));
-        uitex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        NinePatch np = new NinePatch(uitex, 8, 8, 8, 8);
-        final NinePatchDrawable npd_50 = new NinePatchDrawable(np);
-
-        Texture uitex2 = new Texture(Gdx.files.internal("data/ui75.png"));
-        uitex2.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        NinePatch np2 = new NinePatch(uitex2, 8, 8, 8, 8);
-        final NinePatchDrawable npd_75 = new NinePatchDrawable(np2);
-
-        Texture uitex3 = new Texture(Gdx.files.internal("data/ui90.png"));
-        uitex3.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        NinePatch np3 = new NinePatch(uitex2, 8, 8, 8, 8);
-        final NinePatchDrawable npd_90 = new NinePatchDrawable(np3);*/
 
         Texture windowtex = new Texture(Gdx.files.internal("data/gameui/window.png"));
         windowtex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -166,10 +124,6 @@ public class PlayScreen implements Screen {
 
         final TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle(button_up_npd, button_down_npd, button_up_npd, game.fontsHash.get("small"));
 
-        // TODO: сделать нормальный стиль для диалога
-        //final TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle(npd_50, npd_75, npd_50, game.fontsHash.get("small"));
-
-        // TODO: сделать нормальный стиль для кнопки
         TextButton shuffleButton = new TextButton("Перемешать", tbs);
         shuffleButton.addListener(new ClickListener() {
             @Override
