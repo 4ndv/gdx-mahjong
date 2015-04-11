@@ -20,7 +20,7 @@ public class Mahjong extends Game {
 
 	@Override
 	public void create () {
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/ls-reg.ttf"));
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/gameui/ObelixPro-cyr.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter param = new FreeTypeFontGenerator.FreeTypeFontParameter();
         BitmapFont font;
 

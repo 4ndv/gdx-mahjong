@@ -156,9 +156,9 @@ public class PlayScreen implements Screen {
         helpButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                Dialog dia = new Dialog("Правила игры", new WindowStyle(game.fontsHash.get("semi-medium"), Color.WHITE, npd_90));
+                Dialog dia = new Dialog("Правила игры", new WindowStyle(game.fontsHash.get("semi-big"), Color.WHITE, npd_90));
                 dia.pad(50, 10, 10, 10);
-                dia.text("Добро пожаловать в пасьянс маджонг!\r\nКраткие правила игры:\r\nНужно убрать с поля все парные фишки.\r\nФишки делятся на два типа: обычные и джокеры.\r\nДжокеры - это фишки с цифрой в левом верхнем углу, и убираются опираясь на картинку в центре.\r\n\r\nФишки не могут быть убраны если:\r\n1. Над ней есть другая фишка\r\n2. Слева и справа от неё есть другие фишки", new Label.LabelStyle(game.fontsHash.get("small"), Color.WHITE));
+                dia.text("Добро пожаловать в пасьянс маджонг!\r\nКраткие правила игры:\r\nНужно убрать с поля все парные фишки.\r\nФишки делятся на два типа: обычные и джокеры.\r\nДжокеры - это фишки с цифрой в левом верхнем углу,\r\nи убираются опираясь на картинку в центре.\r\n\r\nФишки не могут быть убраны если:\r\n1. Над ней есть другая фишка\r\n2. Слева и справа от неё есть другие фишки", new Label.LabelStyle(game.fontsHash.get("small"), Color.WHITE));
                 dia.button("OK", true, tbs);
 
                 dia.show(stage);
