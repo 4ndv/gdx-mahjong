@@ -2,7 +2,6 @@ package ru.andreyviktorov.mahjong;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -15,7 +14,7 @@ public class Mahjong extends Game {
     private static final String FONT_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.:;,{}\"´`'<>";
     Map<String, BitmapFont> fontsHash = new HashMap<String, BitmapFont>();
     public float tenth;
-    public float twelveth;
+    public float twentyth;
 
 
 	@Override
@@ -25,36 +24,36 @@ public class Mahjong extends Game {
         BitmapFont font;
 
         this.tenth = Gdx.graphics.getHeight() / 10;
-        this.twelveth = Gdx.graphics.getHeight() / 20;
+        this.twentyth = Gdx.graphics.getHeight() / 20;
 
         param.size = Math.round(Gdx.graphics.getHeight() / 22);
         param.characters = FONT_CHARACTERS;
         font = generator.generateFont(param);
-        font.setColor(Color.WHITE);
+        font.setColor(Color.DARK_GRAY);
 
         fontsHash.put("big", font);
 
         param.size = Math.round(Gdx.graphics.getHeight() / 24);
         font = generator.generateFont(param);
-        font.setColor(Color.WHITE);
+        font.setColor(Color.DARK_GRAY);
 
         fontsHash.put("semi-big", font);
 
         param.size = Math.round(Gdx.graphics.getHeight() / 30);
         font = generator.generateFont(param);
-        font.setColor(Color.WHITE);
+        font.setColor(Color.DARK_GRAY);
 
         fontsHash.put("medium", font);
 
         param.size = Math.round(Gdx.graphics.getHeight() / 35);
         font = generator.generateFont(param);
-        font.setColor(Color.WHITE);
+        font.setColor(Color.DARK_GRAY);
 
         fontsHash.put("semi-medium", font);
 
         param.size = Math.round(Gdx.graphics.getHeight() / 40);
         font = generator.generateFont(param);
-        font.setColor(Color.WHITE);
+        font.setColor(Color.DARK_GRAY);
 
         fontsHash.put("small", font);
 

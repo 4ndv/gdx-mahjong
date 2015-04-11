@@ -80,43 +80,60 @@ public class PlayScreen implements Screen {
 
         backgrounds = new ArrayList();
 
-        backgrounds.add("data/backgrounds/1-leaves.jpg");
-        backgrounds.add("data/backgrounds/2-leaves.jpg");
-        backgrounds.add("data/backgrounds/3-leaves.jpg");
+        backgrounds.add("data/backgrounds/geometry.png");
+        backgrounds.add("data/backgrounds/geometry2.png");
+        //backgrounds.add("data/backgrounds/sativa.png");
+        backgrounds.add("data/backgrounds/photography.png");
 
         Collections.shuffle(backgrounds);
 
-        float koeff_bg = 1920F/1080F;
+        //float koeff_bg = 1920F/1080F;
+        //Texture bg_img = new Texture(Gdx.files.internal(backgrounds.get(0)));
+        //bg_img.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        //gamedata.background = new Image(bg_img);
+        //gamedata.background.setWidth(Gdx.graphics.getWidth());
+        //gamedata.background.setHeight(Gdx.graphics.getWidth() / koeff_bg);
+        //if (Gdx.graphics.getWidth() / koeff_bg < Gdx.graphics.getHeight()) {
+        //    gamedata.background.setHeight(Gdx.graphics.getHeight());
+        //}
+
+        //back.addActor(gamedata.background);
+
         Texture bg_img = new Texture(Gdx.files.internal(backgrounds.get(0)));
-        bg_img.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        gamedata.background = new Image(bg_img);
-        gamedata.background.setWidth(Gdx.graphics.getWidth());
-        gamedata.background.setHeight(Gdx.graphics.getWidth() / koeff_bg);
-        if (Gdx.graphics.getWidth() / koeff_bg < Gdx.graphics.getHeight()) {
-            gamedata.background.setHeight(Gdx.graphics.getHeight());
+        int w_count = (int)Math.ceil((double)Gdx.graphics.getWidth() / (double)bg_img.getWidth());
+        int h_count = (int)Math.ceil((double)Gdx.graphics.getHeight() / (double)bg_img.getHeight());
+        int bg_w = bg_img.getWidth();
+        int bg_h = bg_img.getHeight();
+        for(int i = 0; i<w_count; i++) {
+            for(int j = 0; j<h_count; j++) {
+                Image tempimg = new Image(bg_img);
+                tempimg.setPosition(bg_w * i, bg_h * j);
+                back.addActor(tempimg);
+            }
         }
 
-        back.addActor(gamedata.background);
-
-        Image topbar = new Image(new Texture(Gdx.files.internal("data/ui.png")));
+        /*Image topbar = new Image(new Texture(Gdx.files.internal("data/ui.png")));
         topbar.setColor(0,0,0,0.3F);
         float barheight = Gdx.graphics.getHeight()/10;
         topbar.setSize(Gdx.graphics.getWidth(), barheight);
         topbar.setPosition(0, Gdx.graphics.getHeight() - barheight);
 
-        back.addActor(topbar);
+        back.addActor(topbar);*/
 
         Label.LabelStyle ls = new Label.LabelStyle();
         ls.font = game.fontsHash.get("semi-big");
+        ls.fontColor = Color.DARK_GRAY;
         remainLabel = new Label("Осталось фишек: " + gamedata.field.getMaxTilesCount(), ls);
-        remainLabel.setPosition(Gdx.graphics.getWidth()/48,
-                Gdx.graphics.getHeight() - Utils.getCenteredHeight(barheight, remainLabel.getHeight()));
+        remainLabel.setPosition(game.twentyth/2, Gdx.graphics.getHeight() - remainLabel.getHeight() - game.twentyth/4);
+        //remainLabel.setPosition(Gdx.graphics.getWidth()/48,
+        //        Gdx.graphics.getHeight() - Utils.getCenteredHeight(barheight, remainLabel.getHeight()));
 
         availableLabel = new Label("Возможных ходов: " + countAvailablePairs(), ls);
+        availableLabel.setPosition(Gdx.graphics.getWidth() - availableLabel.getWidth() - game.twentyth/2, Gdx.graphics.getHeight() - availableLabel.getHeight() - game.twentyth/4);
 
-        float apos = Gdx.graphics.getWidth() - Gdx.graphics.getWidth()/50 - availableLabel.getWidth();
+        //float apos = Gdx.graphics.getWidth() - Gdx.graphics.getWidth()/50 - availableLabel.getWidth();
 
-        availableLabel.setPosition(apos, Gdx.graphics.getHeight() - Utils.getCenteredHeight(barheight, availableLabel.getHeight()));
+        //availableLabel.setPosition(apos, Gdx.graphics.getHeight() - Utils.getCenteredHeight(barheight, availableLabel.getHeight()));
 
         back.addActor(remainLabel);
         back.addActor(availableLabel);
@@ -124,7 +141,7 @@ public class PlayScreen implements Screen {
         Table tbl = new Table();
         tbl.setWidth(Gdx.graphics.getWidth());
 
-        Texture uitex = new Texture(Gdx.files.internal("data/uihalf.png"));
+        /*Texture uitex = new Texture(Gdx.files.internal("data/uihalf.png"));
         uitex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         NinePatch np = new NinePatch(uitex, 8, 8, 8, 8);
         final NinePatchDrawable npd_50 = new NinePatchDrawable(np);
@@ -137,10 +154,20 @@ public class PlayScreen implements Screen {
         Texture uitex3 = new Texture(Gdx.files.internal("data/ui90.png"));
         uitex3.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         NinePatch np3 = new NinePatch(uitex2, 8, 8, 8, 8);
-        final NinePatchDrawable npd_90 = new NinePatchDrawable(np3);
+        final NinePatchDrawable npd_90 = new NinePatchDrawable(np3);*/
+
+        Texture windowtex = new Texture(Gdx.files.internal("data/gameui/window.png"));
+        windowtex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        final NinePatchDrawable windownp = new NinePatchDrawable(new NinePatch(windowtex, 30, 30, 50, 20));
+
+        final NinePatchDrawable button_up_npd = new NinePatchDrawable(new NinePatch(new Texture(Gdx.files.internal("data/gameui/button-up.png")), 15, 15, 15, 15));
+        final NinePatchDrawable button_down_npd = new NinePatchDrawable(new NinePatch(new Texture(Gdx.files.internal("data/gameui/button-down.png")), 15, 15, 15, 15));
+
+
+        final TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle(button_up_npd, button_down_npd, button_up_npd, game.fontsHash.get("small"));
 
         // TODO: сделать нормальный стиль для диалога
-        final TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle(npd_50, npd_75, npd_50, game.fontsHash.get("small"));
+        //final TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle(npd_50, npd_75, npd_50, game.fontsHash.get("small"));
 
         // TODO: сделать нормальный стиль для кнопки
         TextButton shuffleButton = new TextButton("Перемешать", tbs);
@@ -156,9 +183,9 @@ public class PlayScreen implements Screen {
         helpButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                Dialog dia = new Dialog("Правила игры", new WindowStyle(game.fontsHash.get("semi-big"), Color.WHITE, npd_90));
-                dia.pad(50, 10, 10, 10);
-                dia.text("Добро пожаловать в пасьянс маджонг!\r\nКраткие правила игры:\r\nНужно убрать с поля все парные фишки.\r\nФишки делятся на два типа: обычные и джокеры.\r\nДжокеры - это фишки с цифрой в левом верхнем углу,\r\nи убираются опираясь на картинку в центре.\r\n\r\nФишки не могут быть убраны если:\r\n1. Над ней есть другая фишка\r\n2. Слева и справа от неё есть другие фишки", new Label.LabelStyle(game.fontsHash.get("small"), Color.WHITE));
+                Dialog dia = new Dialog("Правила игры", new WindowStyle(game.fontsHash.get("semi-big"), Color.DARK_GRAY, windownp));
+                dia.pad(90, 40, 20, 40);
+                dia.text("Добро пожаловать в пасьянс маджонг!\r\nКраткие правила игры:\r\nНужно убрать с поля все парные фишки.\r\nФишки делятся на два типа: обычные и джокеры.\r\nДжокеры - это фишки с цифрой в левом верхнем углу,\r\nи убираются опираясь на картинку в центре.\r\n\r\nФишки не могут быть убраны если:\r\n1. Над ней есть другая фишка\r\n2. Слева и справа от нее есть другие фишки", new Label.LabelStyle(game.fontsHash.get("small"), Color.DARK_GRAY));
                 dia.button("OK", true, tbs);
 
                 dia.show(stage);
