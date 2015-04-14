@@ -102,17 +102,6 @@ public class PlayScreen implements Screen {
         Label.LabelStyle ls = new Label.LabelStyle();
         ls.font = game.fontsHash.get("semi-big");
         ls.fontColor = Color.DARK_GRAY;
-        remainLabel = new Label("Осталось фишек: " + gamedata.field.getMaxTilesCount(), ls);
-        //remainLabel.setPosition(game.twentyth/2, Gdx.graphics.getHeight() - remainLabel.getHeight() - game.twentyth/4);
-
-        availableLabel = new Label("Возможных ходов: " + countAvailablePairs(), ls);
-        //availableLabel.setPosition(Gdx.graphics.getWidth() - availableLabel.getWidth() - game.twentyth/2, Gdx.graphics.getHeight() - availableLabel.getHeight() - game.twentyth/4);
-
-        //back.addActor(remainLabel);
-        //back.addActor(availableLabel);
-
-        Table tbl = new Table();
-        tbl.setWidth(Gdx.graphics.getWidth());
 
         Texture windowtex = new Texture(Gdx.files.internal("data/gameui/window.png"));
         windowtex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -164,6 +153,12 @@ public class PlayScreen implements Screen {
         });
         TextButton menuButton = new TextButton("Меню", tbs);
 
+        remainLabel = new Label("Осталось фишек: " + gamedata.field.getMaxTilesCount(), ls);
+        availableLabel = new Label("Возможных ходов: " + countAvailablePairs(), ls);
+
+        Table tbl = new Table();
+        tbl.setWidth(Gdx.graphics.getWidth());
+
         //tbl.setDebug(true);
         tbl.align(Align.bottomLeft);
         tbl.add(shuffleButton).pad(5);
@@ -211,19 +206,9 @@ public class PlayScreen implements Screen {
             for(int i = 0; i<gamedata.field.getWidth(); i++) {
                 for(int j = 0; j<gamedata.field.getHeight(); j++) {
                     if(layer.data[i][j] != null) {
-                        // Получаем шириновысоту
-                        /*System.out.println(layer.data[i][j].getHeight());
-                        TILE_WIDTH = layer.data[i][j].getWidth();
-                        TILE_HEIGHT = layer.data[i][j].getHeight();*/
-
                         // +2 для отступов
                         fieldWidth = TILE_WIDTH * ((gamedata.field.getWidth() + 2) / 2) - TILE_WIDTH;
                         fieldHeight = TILE_HEIGHT * ((gamedata.field.getHeight() + 2) / 2) - TILE_HEIGHT;
-
-
-                        //System.out.println(layer.data[i][j].tile.suit.name());
-
-                        //System.out.println("TILE_W " + TILE_WIDTH + " TILE_H " + TILE_HEIGHT + " FW " + fieldWidth + " FH " + fieldHeight);
 
                         fieldPosX = Gdx.graphics.getWidth()/2 - fieldWidth / 2;
                         fieldPosY = Gdx.graphics.getHeight()/2 - fieldHeight / 2;
@@ -247,8 +232,6 @@ public class PlayScreen implements Screen {
 
                         shadowPool.add(shadowimgs[i][j][layernumber]);
                         layerPool.add(layer.data[i][j]);
-                        //stage.addActor(shadowimgs[i][j][layernumber]);
-                        //stage.addActor(layer.data[i][j]);
                     }
                 }
             }
