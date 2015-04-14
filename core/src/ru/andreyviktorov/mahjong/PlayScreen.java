@@ -103,13 +103,13 @@ public class PlayScreen implements Screen {
         ls.font = game.fontsHash.get("semi-big");
         ls.fontColor = Color.DARK_GRAY;
         remainLabel = new Label("Осталось фишек: " + gamedata.field.getMaxTilesCount(), ls);
-        remainLabel.setPosition(game.twentyth/2, Gdx.graphics.getHeight() - remainLabel.getHeight() - game.twentyth/4);
+        //remainLabel.setPosition(game.twentyth/2, Gdx.graphics.getHeight() - remainLabel.getHeight() - game.twentyth/4);
 
         availableLabel = new Label("Возможных ходов: " + countAvailablePairs(), ls);
-        availableLabel.setPosition(Gdx.graphics.getWidth() - availableLabel.getWidth() - game.twentyth/2, Gdx.graphics.getHeight() - availableLabel.getHeight() - game.twentyth/4);
+        //availableLabel.setPosition(Gdx.graphics.getWidth() - availableLabel.getWidth() - game.twentyth/2, Gdx.graphics.getHeight() - availableLabel.getHeight() - game.twentyth/4);
 
-        back.addActor(remainLabel);
-        back.addActor(availableLabel);
+        //back.addActor(remainLabel);
+        //back.addActor(availableLabel);
 
         Table tbl = new Table();
         tbl.setWidth(Gdx.graphics.getWidth());
@@ -172,6 +172,15 @@ public class PlayScreen implements Screen {
         tbl.add(cancelButton).pad(5);
         tbl.add(menuButton).pad(5);
         stage.addActor(tbl);
+
+        Table tbl2 = new Table();
+        tbl2.setWidth(Gdx.graphics.getWidth());
+        tbl2.align(Align.bottomLeft);
+        tbl2.add(availableLabel).padLeft(5);
+        tbl2.add().expandX();
+        tbl2.add(remainLabel).padRight(5);
+        tbl2.setY(Gdx.graphics.getHeight() - game.fontsHash.get("semi-big").getLineHeight());
+        stage.addActor(tbl2);
 
         rebuildField();
 
