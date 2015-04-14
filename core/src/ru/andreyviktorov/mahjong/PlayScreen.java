@@ -164,17 +164,8 @@ public class PlayScreen implements Screen {
         });
         TextButton menuButton = new TextButton("Меню", tbs);
 
-        tbl.setDebug(true);
-        tbl.setFillParent(true);
-        //tbl.add(availableLabel).align(Align.topLeft);
-        tbl.add(availableLabel);
-        tbl.add().expandX();
-        //tbl.add(remainLabel).align(Align.topRight);
-        tbl.add(remainLabel);
-        tbl.row();
-        tbl.add().expandY();
-        tbl.row().align(Align.bottomLeft);
-        //tbl.align(Align.bottomLeft);
+        //tbl.setDebug(true);
+        tbl.align(Align.bottomLeft);
         tbl.add(shuffleButton).pad(5);
         tbl.add(helpButton).pad(5);
         tbl.add().expandX();
