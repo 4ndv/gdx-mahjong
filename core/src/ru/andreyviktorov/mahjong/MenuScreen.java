@@ -34,7 +34,6 @@ public class MenuScreen implements Screen{
     public MenuScreen(Mahjong gam) {
         game = gam;
         stage = new Stage();
-        Gdx.input.setInputProcessor(stage);
 
         Texture bgtex = new Texture(Gdx.files.internal("data/menu/bg.png"));
         bgtex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -78,25 +77,27 @@ public class MenuScreen implements Screen{
         tbl.setFillParent(true);
         //tbl.add(new Label("Привет, мир", new Label.LabelStyle(game.fontsHash.get("big"), Color.WHITE)));
 
-        Texture logotex = new Texture(Gdx.files.internal("data/menu/logo.png"));
-        logotex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        Image logoimg = new Image(logotex);
-        float logoh = logoimg.getHeight();
+        //Texture logotex = new Texture(Gdx.files.internal("data/menu/logo.png"));
+        //logotex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        //Image logoimg = new Image(logotex);
+        //float logoh = logoimg.getHeight();
         //logoimg.setX(Gdx.graphics.getWidth() / 2F - logoimg.getWidth() / 2F);
         //logoimg.setY(Gdx.graphics.getHeight() - game.tenth * 2 - logoimg.getHeight());
         //stage.addActor(logoimg);
 
         // 751*279
-        tbl.add(logoimg).top().left().width(game.tenth * 5).height((game.tenth * 5) * (279F/751F));
+        //tbl.add(logoimg).top().left().width(game.tenth * 5).height((game.tenth * 5) * (279F/751F));
         //logoimg.setWidth(logoimg.getWidth() * (logoimg.getHeight() / logoh));
+
+        Label logo = new Label("Mahjong", new Label.LabelStyle(game.fontsHash.get("logo"), Color.BLACK));
+        tbl.add(logo).top().left().padLeft(game.tenth/3).padTop(game.tenth/3);
 
         tbl.row();
 
         Table scrollTable = new Table();
+        scrollTable.pad(game.tenth/3);
         ScrollPane sp = new ScrollPane(scrollTable);
         scrollTable.align(Align.topLeft);
-        scrollTable.add(new Label("Простые", new Label.LabelStyle(game.fontsHash.get("big"), Color.BLACK)));
-        scrollTable.row();
 
         Texture uitex = new Texture(Gdx.files.internal("data/uihalf.png"));
         uitex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -113,34 +114,35 @@ public class MenuScreen implements Screen{
         NinePatch np3 = new NinePatch(uitex3, 8, 8, 8, 8);
         final NinePatchDrawable npd_90 = new NinePatchDrawable(np3);
 
-        TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle(npd_50, npd_75, npd_50, game.fontsHash.get("semi-big"));
+        scrollTable.add(new Label("Простые", new Label.LabelStyle(game.fontsHash.get("small"), Color.DARK_GRAY))).padBottom(game.tenth / 10).left();
+        scrollTable.row();
+
+        TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle(npd_50, npd_75, npd_50, game.fontsHash.get("small"));
         TextButton tb = new TextButton("Черепаха", tbs);
         tb.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen( new PlayScreen(game, Field.Figure.Turtle) );
+                chooseFigure(Field.Figure.Turtle);
                 return true;
             };
         });
-        scrollTable.add(tb);
+        scrollTable.add(tb).padBottom(game.tenth / 10).left();
+
+        scrollTable.row();
+
+        scrollTable.add(new Label("Средние", new Label.LabelStyle(game.fontsHash.get("small"), Color.DARK_GRAY))).padBottom(game.tenth / 10).left();
+        scrollTable.row();
 
         TextButton tb2 = new TextButton("Три вершины", tbs);
         tb2.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen( new PlayScreen(game, Field.Figure.TriPeaks) );
+                chooseFigure(Field.Figure.TriPeaks);
                 return true;
             };
         });
-        scrollTable.add(tb2);
+        scrollTable.add(tb2).padBottom(game.tenth / 10).left();
 
-        scrollTable.row();
-
-        scrollTable.add(new Label("Средние", new Label.LabelStyle(game.fontsHash.get("big"), Color.BLACK)));
-        scrollTable.row();
-        scrollTable.add(new Label("Сложные", new Label.LabelStyle(game.fontsHash.get("big"), Color.BLACK)));
-        scrollTable.row();
-        scrollTable.add(new Label("Эксперт", new Label.LabelStyle(game.fontsHash.get("big"), Color.BLACK)));
         scrollTable.row();
 
         tbl.add(sp).fill().expand();
@@ -148,6 +150,17 @@ public class MenuScreen implements Screen{
         //tbl.setDebug(true);
 
         stage.addActor(tbl);
+
+        Gdx.input.setInputProcessor(stage);
+    }
+
+    public void refreshInput() {
+        Gdx.input.setInputProcessor(stage);
+    }
+
+    public void chooseFigure(Field.Figure figure) {
+        // Если фигура сохранена, сделать refreshInput
+        game.setScreen(new PlayScreen(game, figure));
     }
 
     @Override

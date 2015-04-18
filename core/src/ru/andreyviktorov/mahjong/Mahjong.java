@@ -57,7 +57,15 @@ public class Mahjong extends Game {
 
         fontsHash.put("small", font);
 
+        param.size = Math.round(Gdx.graphics.getHeight() / 10);
+        font = generator.generateFont(param);
+        font.setColor(Color.DARK_GRAY);
+
+        fontsHash.put("logo", font);
+
         generator.dispose();
+        Static.mahjong = this;
+        Static.menuscreen = new MenuScreen(Static.mahjong);
         setScreen(new MenuScreen(this));
 	}
 

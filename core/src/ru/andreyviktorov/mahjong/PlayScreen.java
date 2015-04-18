@@ -127,7 +127,7 @@ public class PlayScreen implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 Dialog dia = new Dialog("Правила игры", new WindowStyle(game.fontsHash.get("semi-big"), Color.DARK_GRAY, windownp));
-                dia.pad(90, 40, 20, 40);
+                dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 4F, game.tenth / 2F);
                 dia.text("Добро пожаловать в пасьянс маджонг!\r\nКраткие правила игры:\r\nНужно убрать с поля все парные фишки.\r\nФишки делятся на два типа: обычные и джокеры.\r\nДжокеры - это фишки с цифрой в левом верхнем углу,\r\nи убираются опираясь на картинку в центре.\r\n\r\nФишки не могут быть убраны если:\r\n1. Над ней есть другая фишка\r\n2. Слева и справа от нее есть другие фишки", new Label.LabelStyle(game.fontsHash.get("small"), Color.DARK_GRAY));
                 dia.button("OK", true, tbs);
 
@@ -152,6 +152,13 @@ public class PlayScreen implements Screen {
             }
         });
         TextButton menuButton = new TextButton("Меню", tbs);
+        menuButton.addListener(new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                gotoMenu();
+                return true;
+            }
+        });
 
         remainLabel = new Label("Осталось фишек: " + gamedata.field.getMaxTilesCount(), ls);
         availableLabel = new Label("Возможных ходов: " + countAvailablePairs(), ls);
@@ -171,9 +178,9 @@ public class PlayScreen implements Screen {
         Table tbl2 = new Table();
         tbl2.setWidth(Gdx.graphics.getWidth());
         tbl2.align(Align.bottomLeft);
-        tbl2.add(availableLabel).padLeft(5);
+        tbl2.add(remainLabel).padLeft(5);
         tbl2.add().expandX();
-        tbl2.add(remainLabel).padRight(5);
+        tbl2.add(availableLabel).padRight(5);
         tbl2.setY(Gdx.graphics.getHeight() - game.fontsHash.get("semi-big").getLineHeight());
         stage.addActor(tbl2);
 
@@ -181,6 +188,20 @@ public class PlayScreen implements Screen {
 
         Gdx.input.setInputProcessor(stage);
         Gdx.input.setCatchBackKey(true);
+    }
+
+    public void saveField() {
+
+    }
+
+    public void gotoMenu() {
+        saveField();
+        Static.menuscreen.refreshInput();
+        game.setScreen( Static.menuscreen );
+    }
+
+    public void refreshInput() {
+        Gdx.input.setInputProcessor(stage);
     }
 
     public static void recountMoves() {
