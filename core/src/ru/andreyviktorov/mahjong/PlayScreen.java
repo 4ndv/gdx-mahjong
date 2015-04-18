@@ -58,7 +58,18 @@ public class PlayScreen implements Screen {
         gamedata.scaleModificator = Field.getFigureHeight(figure) - 6.5F;
         System.out.println("СМ:" + gamedata.scaleModificator);
 
-        gamedata.field = new Field(figure);
+        // Генерируем поле с наибольшим числом доступных ходов изначально, снижая этим процент нерешаемых полей
+        Field tempfield = null;
+        int fieldrecord = 0;
+        for(int i = 0; i<20; i++) {
+            Field tmp = new Field(figure);
+            int tmprecord = tmp.countAvailablePairs();
+            if(tmprecord > fieldrecord) {
+                tempfield = tmp;
+                fieldrecord = tmprecord;
+            }
+        }
+        gamedata.field = tempfield;
         gamedata.remainingTiles = gamedata.field.getMaxTilesCount();
 
         glowtexture = new Texture(Gdx.files.internal("data/tiles/TileSelected.png"));
@@ -161,7 +172,7 @@ public class PlayScreen implements Screen {
         });
 
         remainLabel = new Label("Осталось фишек: " + gamedata.field.getMaxTilesCount(), ls);
-        availableLabel = new Label("Возможных ходов: " + countAvailablePairs(), ls);
+        availableLabel = new Label("Возможных ходов: " + gamedata.field.countAvailablePairs(), ls);
 
         Table tbl = new Table();
         tbl.setWidth(Gdx.graphics.getWidth());
@@ -196,8 +207,7 @@ public class PlayScreen implements Screen {
 
     public void gotoMenu() {
         saveField();
-        Static.menuscreen.refreshInput();
-        game.setScreen( Static.menuscreen );
+        game.setScreen( new MenuScreen(Static.mahjong) );
     }
 
     public void refreshInput() {
@@ -205,7 +215,7 @@ public class PlayScreen implements Screen {
     }
 
     public static void recountMoves() {
-        PlayScreen.availableLabel.setText("Возможных ходов: " + PlayScreen.countAvailablePairs());
+        PlayScreen.availableLabel.setText("Возможных ходов: " + gamedata.field.countAvailablePairs());
     }
 
     public static void rebuildField() {
@@ -277,36 +287,6 @@ public class PlayScreen implements Screen {
     public static void clearSelection() {
         PlayScreen.glowimg.setPosition(-500, -500);
         PlayScreen.gamedata.selected = null;
-    }
-
-    public static int countAvailablePairs() {
-        List<TileActor> avalist = new ArrayList();
-        Field f = PlayScreen.gamedata.field;
-        int n = 0;
-        for(Layer l : f.layers) {
-            for(int i = 0; i<f.getWidth() + 1; i++) {
-                for(int j = 0; j<f.getHeight() + 1; j++) {
-                    if(l.data[i][j] != null) {
-                        if(f.canRemove(n, i, j)) {
-                            avalist.add(l.data[i][j]);
-                        }
-                    }
-                }
-            }
-            n++;
-        }
-
-        int c = 0;
-
-        for(TileActor one : avalist) {
-            for(TileActor two : avalist) {
-                if((one.randomId != two.randomId) && ((one.tile.suit == two.tile.suit && one.tile.number == two.tile.number) || (one.tile.suit == two.tile.suit && one.tile.suit == Tile.Suit.Season) || (one.tile.suit == two.tile.suit && one.tile.suit == Tile.Suit.Flower))) {
-                    c++;
-                }
-            }
-        }
-
-        return c/2;
     }
 
     @Override

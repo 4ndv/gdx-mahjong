@@ -65,7 +65,6 @@ public class Mahjong extends Game {
 
         generator.dispose();
         Static.mahjong = this;
-        Static.menuscreen = new MenuScreen(Static.mahjong);
         setScreen(new MenuScreen(this));
 	}
 

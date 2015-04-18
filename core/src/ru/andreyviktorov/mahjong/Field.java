@@ -365,4 +365,34 @@ public class Field {
                 break;
         }
     }
+
+    public int countAvailablePairs() {
+        List<TileActor> avalist = new ArrayList();
+        Field f = this;
+        int n = 0;
+        for(Layer l : f.layers) {
+            for(int i = 0; i<f.getWidth() + 1; i++) {
+                for(int j = 0; j<f.getHeight() + 1; j++) {
+                    if(l.data[i][j] != null) {
+                        if(f.canRemove(n, i, j)) {
+                            avalist.add(l.data[i][j]);
+                        }
+                    }
+                }
+            }
+            n++;
+        }
+
+        int c = 0;
+
+        for(TileActor one : avalist) {
+            for(TileActor two : avalist) {
+                if((one.randomId != two.randomId) && ((one.tile.suit == two.tile.suit && one.tile.number == two.tile.number) || (one.tile.suit == two.tile.suit && one.tile.suit == Tile.Suit.Season) || (one.tile.suit == two.tile.suit && one.tile.suit == Tile.Suit.Flower))) {
+                    c++;
+                }
+            }
+        }
+
+        return c/2;
+    }
 }
