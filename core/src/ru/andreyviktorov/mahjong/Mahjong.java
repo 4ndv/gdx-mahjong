@@ -9,6 +9,12 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+    Хранилища:
+    leveldata - сохраненные игры
+    statdata - статистика
+    appdata - системная информация о приложении (например, версия)
+ */
 
 public class Mahjong extends Game {
     private static final String FONT_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.:;,{}\"´`'<>";

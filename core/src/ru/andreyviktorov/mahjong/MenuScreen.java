@@ -1,12 +1,14 @@
 package ru.andreyviktorov.mahjong;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
@@ -19,6 +21,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MenuScreen implements Screen{
     Mahjong game;
@@ -110,9 +115,20 @@ public class MenuScreen implements Screen{
         Gdx.input.setInputProcessor(stage);
     }
 
-    public void chooseFigure(Field.Figure figure) {
-        // Если фигура сохранена, сделать refreshInput
-        game.setScreen(new PlayScreen(game, figure));
+    public void chooseFigure(final Field.Figure figure) {
+        try {
+            Preferences prefs = Gdx.app.getPreferences("leveldata");
+            String leveldata = prefs.getString(figure.name(), "notfound");
+            System.out.println(leveldata);
+            if(!leveldata.equals("notfound")) {
+                System.out.println("Загружаем из сейва");
+                PlayScreen deserialized = (PlayScreen)Serializer.fromString(leveldata);
+                deserialized.refreshInput();
+                game.setScreen(deserialized);
+            } else {
+                game.setScreen(new PlayScreen(game, figure));
+            }
+        } catch (Exception e) {}
     }
 
     @Override

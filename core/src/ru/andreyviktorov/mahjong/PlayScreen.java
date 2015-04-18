@@ -1,6 +1,7 @@
 package ru.andreyviktorov.mahjong;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -20,12 +21,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PlayScreen implements Screen {
+public class PlayScreen implements Screen, Serializable {
     public static Stage stage;
     final Mahjong game;
     public static float SCALE_RATIO = 128 / Gdx.graphics.getWidth();
@@ -202,12 +204,19 @@ public class PlayScreen implements Screen {
     }
 
     public void saveField() {
-
+        try {
+            Preferences prefs = Gdx.app.getPreferences("leveldata");
+            String leveldata = Serializer.toString(this);
+            prefs.putString(gamedata.field.figure.name(), leveldata);
+            prefs.flush();
+        } catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+        }
     }
 
     public void gotoMenu() {
         saveField();
-        game.setScreen( new MenuScreen(Static.mahjong) );
+        game.setScreen(new MenuScreen(Static.mahjong));
     }
 
     public void refreshInput() {
