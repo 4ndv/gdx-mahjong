@@ -1,8 +1,12 @@
 package ru.andreyviktorov.mahjong;
 
-public class TileData {
+import java.io.Serializable;
+
+public class TileData implements Serializable {
     public float x;
     public float y;
+    public float offset;
+    public float offsetsmall;
     public int datax;
     public int datay;
     public int layer;

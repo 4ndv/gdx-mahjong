@@ -10,11 +10,13 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-public class TileActor extends Actor {
+import java.io.Serializable;
+
+public class TileActor extends Actor implements Serializable {
     public Tile tile;
     public TileData tiledata;
-    private Sprite sprite;
-    private Texture img;
+    private transient Sprite sprite;
+    private transient Texture img;
     public int randomId = 0;
 
     public TileActor(Tile t, TileData td) {
@@ -26,9 +28,13 @@ public class TileActor extends Actor {
         // Что бы не потерять: однострочник для отличной обрезки:
         // for f in *.png; do convert $f -gravity Center -crop 82x128+0+0 cropped/${f%.png}.png; done
 
+        this.refreshTexture();
+    }
+
+    public void refreshTexture() {
         String s = tile.suit.name();
-        if(t.number != 0) {
-            s+="-"+t.number;
+        if(tile.number != 0) {
+            s+="-"+tile.number;
         }
         img = new Texture("data/tiles/" + s + ".png");
         img.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -37,11 +43,15 @@ public class TileActor extends Actor {
         // Магическая константа: отношение ширины к высоте, 82/102 = 0.640625F
         //sprite.setSize(Gdx.graphics.getHeight() * PlayScreen.gamedata.scaleModificator / 100 * 0.640625F, Gdx.graphics.getHeight() * PlayScreen.gamedata.scaleModificator / 100);
         float baseheight = Gdx.graphics.getHeight();
-        float usableheight = baseheight / 10 * 7.5F;
-        float tileheight = usableheight / (tiledata.tilesinrow/2);
-        sprite.setSize(tileheight * 0.640625F, tileheight);
-        PlayScreen.TILE_WIDTH = sprite.getWidth();
-        PlayScreen.TILE_HEIGHT = sprite.getHeight();
+        float usableheight = baseheight / 10 * 9.7F;
+        float tileheight = Math.round(usableheight / (tiledata.tilesinrow/2));
+        float tilewidth = Math.round(tileheight * (212F/256F));
+
+        tiledata.offset = tilewidth /(96F/27F);
+
+        sprite.setSize(tilewidth, tileheight);
+        PlayScreen.TILE_WIDTH = tilewidth - tiledata.offset;
+        PlayScreen.TILE_HEIGHT = tileheight - tiledata.offset;
 
         final TileActor passthis = this;
 
@@ -97,25 +107,20 @@ public class TileActor extends Actor {
 
     public void glowIt() {
         Image img = PlayScreen.glowimg;
-        // Еще одна магическая константа: 102/148
-        //img.setSize(Gdx.graphics.getHeight() * (PlayScreen.gamedata.scaleModificator + 2) / 100 * 0.68918918918F, Gdx.graphics.getHeight() * (PlayScreen.gamedata.scaleModificator + 2) / 100);
-        img.setSize(PlayScreen.TILE_WIDTH * 1.2F, PlayScreen.TILE_HEIGHT * 1.2F);
-        float offsetx = (img.getWidth() - PlayScreen.TILE_WIDTH) / 2;
-        float offsety = (img.getHeight() - PlayScreen.TILE_HEIGHT) / 2;
-
-        img.setPosition(this.tiledata.x - offsetx, this.tiledata.y - offsety);
+        img.setSize(PlayScreen.TILE_WIDTH + this.tiledata.offset, PlayScreen.TILE_HEIGHT + this.tiledata.offset);
+        img.setPosition(this.tiledata.x - this.tiledata.offset/20, this.tiledata.y + this.tiledata.offset/20);
     }
 
     @Override
     public void setBounds(float x, float y, float width, float height) {
-        super.setBounds(x, y, this.sprite.getWidth(), this.sprite.getHeight());
+        super.setBounds(x, y, width, height);
         this.sprite.setPosition(x, y);
     }
 
     @Override
     public void draw(Batch batch, float alpha) {
-        sprite.setPosition(tiledata.x, tiledata.y);
-        this.setBounds(tiledata.x, tiledata.y, PlayScreen.TILE_WIDTH, PlayScreen.TILE_HEIGHT);
+        this.setBounds(tiledata.x, tiledata.y, PlayScreen.TILE_WIDTH, PlayScreen.TILE_HEIGHT + this.tiledata.offset);
+        this.sprite.setPosition(tiledata.x, tiledata.y);
         this.sprite.draw(batch);
     }
 }

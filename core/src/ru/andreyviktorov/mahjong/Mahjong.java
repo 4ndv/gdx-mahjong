@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ import java.util.Map;
     appdata - системная информация о приложении (например, версия)
  */
 
-public class Mahjong extends Game {
+public class Mahjong extends Game implements Serializable {
     private static final String FONT_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.:;,{}\"´`'<>";
     Map<String, BitmapFont> fontsHash = new HashMap<String, BitmapFont>();
     public float tenth;

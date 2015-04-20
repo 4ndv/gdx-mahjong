@@ -1,11 +1,12 @@
 package ru.andreyviktorov.mahjong;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Field {
+public class Field implements Serializable {
     private int width;
     private int height;
     private int tilecount;
@@ -133,8 +134,6 @@ public class Field {
 
     public void remove(TileActor actor) {
         PlayScreen.gamedata.field.layers.get(actor.tiledata.layer).data[actor.tiledata.datax][actor.tiledata.datay] = null;
-        PlayScreen.shadowimgs[actor.tiledata.datax][actor.tiledata.datay][actor.tiledata.layer].remove();
-        PlayScreen.shadowimgs[actor.tiledata.datax][actor.tiledata.datay][actor.tiledata.layer] = null;
         actor.remove();
     }
 

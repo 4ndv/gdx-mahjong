@@ -1,11 +1,10 @@
 package ru.andreyviktorov.mahjong;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import java.io.Serializable;
 
-public class GameData {
+public class GameData implements Serializable {
     public Field field;
-    public float scaleModificator;
-    public TileActor selected;
-    public Image background;
+    // Это поле тоже не надо сериализовать
+    public transient TileActor selected;
     public int remainingTiles;
 }

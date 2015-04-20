@@ -1,6 +1,8 @@
 package ru.andreyviktorov.mahjong;
 
-public class Layer {
+import java.io.Serializable;
+
+public class Layer implements Serializable {
     public TileActor[][] data;
     private int width;
     private int height;

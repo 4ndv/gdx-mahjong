@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,14 +29,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class PlayScreen implements Screen, Serializable {
-    public static Stage stage;
-    final Mahjong game;
+    // Не сериализуем эти два
+    public transient static Stage stage;
+    public transient static Mahjong game;
+
     public static float SCALE_RATIO = 128 / Gdx.graphics.getWidth();
     public static float TILE_WIDTH;
     public static float TILE_HEIGHT;
     public static GameData gamedata;
     public static List<List<Image>> shadows = new ArrayList();
-    public static Texture shadowtexture;
     public static Texture glowtexture;
     public static Image glowimg;
     public static Image[][][] shadowimgs;
@@ -50,37 +52,42 @@ public class PlayScreen implements Screen, Serializable {
     public static Label remainLabel;
     public static Label availableLabel;
 
+    // Перегруженные конструкторы для использования с
     public PlayScreen (final Mahjong gameref, final Field.Figure figure) {
-        game = gameref;
+        this.load(gameref, figure);
+    }
 
+    public PlayScreen (final Mahjong gameref, final Field.Figure figure, GameData gd) {
+        this.injectGamedata(gd);
+        this.load(gameref, figure);
+    }
+
+    public void load(final Mahjong gameref, Field.Figure figure) {
+        game = gameref;
         stage = new Stage(new ScreenViewport());
 
-        // TODO: сделать загрузку геймдаты из сейва
-        gamedata = new GameData();
-        gamedata.scaleModificator = Field.getFigureHeight(figure) - 6.5F;
-        System.out.println("СМ:" + gamedata.scaleModificator);
+        if(gamedata == null) {
+            gamedata = new GameData();
 
-        // Генерируем поле с наибольшим числом доступных ходов изначально, снижая этим процент нерешаемых полей
-        Field tempfield = null;
-        int fieldrecord = 0;
-        for(int i = 0; i<20; i++) {
-            Field tmp = new Field(figure);
-            int tmprecord = tmp.countAvailablePairs();
-            if(tmprecord > fieldrecord) {
-                tempfield = tmp;
-                fieldrecord = tmprecord;
+            // Генерируем поле с наибольшим числом доступных ходов изначально, снижая этим процент нерешаемых полей. Из-за высокой нагрузки число обходов ограничено 4-мя, надеемся на благосклонность рандома
+            Field tempfield = null;
+            int fieldrecord = 0;
+            for (int i = 0; i < 4; i++) {
+                Field tmp = new Field(figure);
+                int tmprecord = tmp.countAvailablePairs();
+                if (tmprecord > fieldrecord) {
+                    tempfield = tmp;
+                    fieldrecord = tmprecord;
+                }
             }
+
+            gamedata.field = tempfield;
+            gamedata.remainingTiles = gamedata.field.getMaxTilesCount();
         }
-        gamedata.field = tempfield;
-        gamedata.remainingTiles = gamedata.field.getMaxTilesCount();
 
         glowtexture = new Texture(Gdx.files.internal("data/tiles/TileSelected.png"));
         glowimg = new Image(glowtexture);
         glowimg.setPosition(-500, -500);
-        shadowimgs = new Image[gamedata.field.getWidth()+1][gamedata.field.getHeight()+1][gamedata.field.layers.size()+1];
-
-        shadowtexture = new Texture(Gdx.files.internal("data/tiles/TileShadow.png"));
-        shadowtexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         back = new Group();
         back.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -173,7 +180,7 @@ public class PlayScreen implements Screen, Serializable {
             }
         });
 
-        remainLabel = new Label("Осталось фишек: " + gamedata.field.getMaxTilesCount(), ls);
+        remainLabel = new Label("Осталось фишек: " + gamedata.remainingTiles, ls);
         availableLabel = new Label("Возможных ходов: " + gamedata.field.countAvailablePairs(), ls);
 
         Table tbl = new Table();
@@ -203,14 +210,29 @@ public class PlayScreen implements Screen, Serializable {
         Gdx.input.setCatchBackKey(true);
     }
 
+    public void injectGamedata(GameData gd) {
+        this.gamedata = gd;
+        for(Layer l : this.gamedata.field.layers) {
+            for(TileActor[] taa : l.data) {
+                for(TileActor ta : taa) {
+                    if(ta != null) {
+                        ta.refreshTexture();
+                    }
+                }
+            }
+        }
+    }
+
     public void saveField() {
-        try {
-            Preferences prefs = Gdx.app.getPreferences("leveldata");
-            String leveldata = Serializer.toString(this);
-            prefs.putString(gamedata.field.figure.name(), leveldata);
-            prefs.flush();
-        } catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
+        if(this.gamedata.remainingTiles > 0) {
+            try {
+                Preferences prefs = Gdx.app.getPreferences("leveldata");
+                String leveldata = Serializer.toString(this.gamedata);
+                prefs.putString(gamedata.field.figure.name(), leveldata);
+                prefs.flush();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
         }
     }
 
@@ -236,7 +258,8 @@ public class PlayScreen implements Screen, Serializable {
         float fieldPosY;
 
         // z-index
-        float g_offset_y = 0;
+        float g_offset = 0;
+        float g_offset_one = 0;
         int layernumber = 0;
         List<TileActor> layerPool;
         List<Image> shadowPool;
@@ -244,7 +267,7 @@ public class PlayScreen implements Screen, Serializable {
             layerPool = new LinkedList();
             shadowPool = new LinkedList();
             for(int i = 0; i<gamedata.field.getWidth(); i++) {
-                for(int j = 0; j<gamedata.field.getHeight(); j++) {
+                for(int j = gamedata.field.getHeight()-1; j>=0; j--) {
                     if(layer.data[i][j] != null) {
                         // +2 для отступов
                         fieldWidth = TILE_WIDTH * ((gamedata.field.getWidth() + 2) / 2) - TILE_WIDTH;
@@ -257,38 +280,25 @@ public class PlayScreen implements Screen, Serializable {
                         layer.data[i][j].tiledata.datay = j;
                         layer.data[i][j].tiledata.layer = layernumber;
 
-                        layer.data[i][j].tiledata.x = fieldPosX + TILE_WIDTH * i/2;
-                        layer.data[i][j].tiledata.y = fieldPosY + TILE_HEIGHT * j/2 - g_offset_y;
+                        layer.data[i][j].tiledata.x = fieldPosX + TILE_WIDTH * i/2 - g_offset;
+                        layer.data[i][j].tiledata.y = fieldPosY + TILE_HEIGHT * j/2 + g_offset;
 
-                        Image img = new Image(PlayScreen.shadowtexture);
-                        // Еще одна магическая константа: 102/148
-                        img.setSize(TILE_WIDTH * 1.3F, TILE_HEIGHT * 1.3F);
-                        float offsetx = (img.getWidth() - TILE_WIDTH) / 2;
-                        float offsety = (img.getHeight() - TILE_HEIGHT) / 2;
+                        g_offset_one = layer.data[i][j].tiledata.offset - layer.data[i][j].tiledata.offset/1.78461538F;
 
-                        img.setPosition(fieldPosX + TILE_WIDTH * i/2 - offsetx, fieldPosY + TILE_HEIGHT * j/2 - g_offset_y - offsety);
-
-                        shadowimgs[i][j][layernumber] = img;
-
-                        shadowPool.add(shadowimgs[i][j][layernumber]);
                         layerPool.add(layer.data[i][j]);
                     }
                 }
             }
 
-            // Flushing pools
-            for(Image img : shadowPool) {
-                fore.addActor(img);
-            }
             for(TileActor act : layerPool) {
                 fore.addActor(act);
             }
 
             System.out.println("Finished layer " + layernumber);
             layernumber++;
-            g_offset_y += TILE_HEIGHT/5.8;
+            g_offset += g_offset_one;
 
-            // Must be on top of any else
+            // Должен быть поверх
             fore.addActor(glowimg);
         }
     }

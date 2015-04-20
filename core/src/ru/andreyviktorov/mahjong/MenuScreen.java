@@ -116,19 +116,16 @@ public class MenuScreen implements Screen{
     }
 
     public void chooseFigure(final Field.Figure figure) {
-        try {
             Preferences prefs = Gdx.app.getPreferences("leveldata");
             String leveldata = prefs.getString(figure.name(), "notfound");
             System.out.println(leveldata);
             if(!leveldata.equals("notfound")) {
                 System.out.println("Загружаем из сейва");
-                PlayScreen deserialized = (PlayScreen)Serializer.fromString(leveldata);
-                deserialized.refreshInput();
-                game.setScreen(deserialized);
+                GameData deserialized = (GameData)Serializer.fromString(leveldata);
+                game.setScreen(new PlayScreen(game, figure, deserialized));
             } else {
                 game.setScreen(new PlayScreen(game, figure));
             }
-        } catch (Exception e) {}
     }
 
     @Override
