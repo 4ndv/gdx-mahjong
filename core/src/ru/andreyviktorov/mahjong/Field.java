@@ -214,27 +214,49 @@ public class Field implements Serializable {
     }
 
     public void shuffleField() {
-        LinkedList<TileActor> newlist = new LinkedList();
-        for(Layer l : this.layers) {
-            for(TileActor[] act_up : l.data) {
-                for(TileActor act : act_up) {
-                    if(act != null) {
-                        newlist.add(act);
+        do {
+            LinkedList<TileActor> newlist = new LinkedList();
+            LinkedList<TriPoint> points = new LinkedList();
+            int maxlayer = this.layers.size();
+            int l_c = 0;
+            for (Layer l : this.layers) {
+                for (TileActor[] act_up : l.data) {
+                    for (TileActor act : act_up) {
+                        if (act != null) {
+                            newlist.add(act);
+                            points.add(new TriPoint(act.tiledata.datax, act.tiledata.datay, l_c));
+                        }
                     }
                 }
+                l_c++;
             }
-        }
 
-        Collections.shuffle(newlist);
+            Collections.shuffle(newlist);
 
-        this.tiles = newlist;
-        this.layers = new ArrayList();
-        this.generateFigure(this.figure);
-        PlayScreen.previousOne = null;
-        PlayScreen.previousTwo = null;
+            this.tiles = newlist;
+            this.layers = new ArrayList();
 
-        PlayScreen.rebuildField();
-        PlayScreen.recountMoves();
+            for(int i = 0; i<maxlayer; i++) {
+                this.layers.add(this.forkLayer());
+            }
+
+            int sz = points.size();
+            for(int i = 0; i<sz; i++) {
+                TriPoint p = points.poll();
+                TileActor ta = this.tiles.poll();
+                ta.tiledata.layer = p.z;
+                ta.tiledata.datax = p.x;
+                ta.tiledata.datay = p.y;
+                this.layers.get(p.z).setAt(p.x, p.y, ta);
+            }
+
+            PlayScreen.previousOne = null;
+            PlayScreen.previousTwo = null;
+
+            PlayScreen.rebuildField();
+
+            PlayScreen.recountMoves(true);
+        } while (this.countAvailablePairs() == 0);
     }
 
     public void doFigure(Figure fig) {

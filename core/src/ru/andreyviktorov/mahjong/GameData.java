@@ -7,4 +7,5 @@ public class GameData implements Serializable {
     // Это поле тоже не надо сериализовать
     public transient TileActor selected;
     public int remainingTiles;
+    public boolean declined = false;
 }

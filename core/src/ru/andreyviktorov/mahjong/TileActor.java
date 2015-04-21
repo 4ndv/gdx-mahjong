@@ -79,8 +79,9 @@ public class TileActor extends Actor implements Serializable {
                             glowIt();
                         }
                     }
+                    Gdx.input.vibrate(100);
                 } else {
-
+                    Gdx.input.vibrate(new long[] { 0, 150, 100, 150}, -1);
                 }
                 return true;
             }
@@ -102,7 +103,7 @@ public class TileActor extends Actor implements Serializable {
         PlayScreen.gamedata.selected = null;
         PlayScreen.gamedata.remainingTiles -= 2;
         PlayScreen.remainLabel.setText("Осталось фишек: " + PlayScreen.gamedata.remainingTiles);
-        PlayScreen.recountMoves();
+        PlayScreen.recountMoves(false);
     }
 
     public void glowIt() {

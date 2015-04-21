@@ -90,7 +90,6 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-        compile "com.kotcrab.vis:vis-ui:0.7.1:sources"
     }
 }
 
@@ -100,7 +99,6 @@ project(":core") {
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        compile "com.kotcrab.vis:vis-ui:0.7.1"
         compile "com.underwaterapps.overlap2druntime:overlap2d-runtime-libgdx:0.0.8"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     }

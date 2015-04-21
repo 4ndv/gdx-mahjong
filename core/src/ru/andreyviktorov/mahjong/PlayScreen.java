@@ -46,6 +46,8 @@ public class PlayScreen implements Screen, Serializable {
     public static Group back;
     public static Group fore;
 
+    public static Preferences prefs;
+
     public static TileActor previousOne;
     public static TileActor previousTwo;
 
@@ -54,10 +56,12 @@ public class PlayScreen implements Screen, Serializable {
 
     // Перегруженные конструкторы для использования с
     public PlayScreen (final Mahjong gameref, final Field.Figure figure) {
+        prefs = Gdx.app.getPreferences("leveldata");
         this.load(gameref, figure);
     }
 
     public PlayScreen (final Mahjong gameref, final Field.Figure figure, GameData gd) {
+        prefs = Gdx.app.getPreferences("leveldata");
         this.injectGamedata(gd);
         this.load(gameref, figure);
     }
@@ -66,10 +70,10 @@ public class PlayScreen implements Screen, Serializable {
         game = gameref;
         stage = new Stage(new ScreenViewport());
 
-        if(gamedata == null) {
+        if(gamedata == null || gamedata.declined == true) {
             gamedata = new GameData();
 
-            // Генерируем поле с наибольшим числом доступных ходов изначально, снижая этим процент нерешаемых полей. Из-за высокой нагрузки число обходов ограничено 4-мя, надеемся на благосклонность рандома
+            // Генерируем поле с чуть более большим числом доступных ходов изначально, снижая этим процент нерешаемых полей. Из-за высокой нагрузки число обходов ограничено 4-мя, надеемся на благосклонность рандома
             Field tempfield = null;
             int fieldrecord = 0;
             for (int i = 0; i < 4; i++) {
@@ -137,6 +141,15 @@ public class PlayScreen implements Screen, Serializable {
         shuffleButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if(gamedata.field.countAvailablePairs() > 0) {
+                    Dialog dia = new Dialog("Увы", new WindowStyle(game.fontsHash.get("semi-big"), Color.DARK_GRAY, windownp));
+                    dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 4F, game.tenth / 2F);
+                    dia.text("У вас еще есть доступные ходы", new Label.LabelStyle(game.fontsHash.get("small"), Color.DARK_GRAY));
+                    dia.button("OK", true, tbs);
+
+                    dia.show(stage);
+                    return true;
+                }
                 PlayScreen.gamedata.field.shuffleField();
                 clearSelection();
                 return true;
@@ -165,7 +178,7 @@ public class PlayScreen implements Screen, Serializable {
                     PlayScreen.previousOne = null;
                     PlayScreen.previousTwo = null;
                     rebuildField();
-                    recountMoves();
+                    recountMoves(false);
                     clearSelection();
                 }
                 return true;
@@ -176,6 +189,30 @@ public class PlayScreen implements Screen, Serializable {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 gotoMenu();
+                return true;
+            }
+        });
+
+        TextButton surrenderButton = new TextButton("Сдаться", tbs);
+        surrenderButton.addListener(new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                Dialog dia = new Dialog("Сдаться", new WindowStyle(game.fontsHash.get("semi-big"), Color.DARK_GRAY, windownp)) {
+                    public void result(Object obj) {
+                        if(obj == (Object)true) {
+                            gamedata.remainingTiles = 0;
+                            gamedata.declined = true;
+                            gotoMenu();
+                        }
+                    }
+                };
+
+                dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 4F, game.tenth / 2F);
+                dia.text("Вы действительно хотите сдаться?", new Label.LabelStyle(game.fontsHash.get("small"), Color.DARK_GRAY));
+                dia.button("Да", true, tbs);
+                dia.button("Нет", false, tbs);
+
+                dia.show(stage);
                 return true;
             }
         });
@@ -191,6 +228,7 @@ public class PlayScreen implements Screen, Serializable {
         tbl.add(shuffleButton).pad(5);
         tbl.add(helpButton).pad(5);
         tbl.add().expandX();
+        tbl.add(surrenderButton).pad(5);
         tbl.add(cancelButton).pad(5);
         tbl.add(menuButton).pad(5);
         stage.addActor(tbl);
@@ -223,20 +261,22 @@ public class PlayScreen implements Screen, Serializable {
         }
     }
 
-    public void saveField() {
-        if(this.gamedata.remainingTiles > 0) {
+    public static void saveField() {
+        if(gamedata.remainingTiles > 0) {
             try {
-                Preferences prefs = Gdx.app.getPreferences("leveldata");
-                String leveldata = Serializer.toString(this.gamedata);
+                String leveldata = Serializer.toString(gamedata);
                 prefs.putString(gamedata.field.figure.name(), leveldata);
                 prefs.flush();
             } catch (Exception e) {
-                System.out.println(e);
+                throw new RuntimeException(e);
             }
+        } else {
+            prefs.remove(gamedata.field.figure.name());
+            prefs.flush();
         }
     }
 
-    public void gotoMenu() {
+    public static void gotoMenu() {
         saveField();
         game.setScreen(new MenuScreen(Static.mahjong));
     }
@@ -245,8 +285,54 @@ public class PlayScreen implements Screen, Serializable {
         Gdx.input.setInputProcessor(stage);
     }
 
-    public static void recountMoves() {
+    public static void recountMoves(boolean ignore) {
+        int pairs = gamedata.field.countAvailablePairs();
         PlayScreen.availableLabel.setText("Возможных ходов: " + gamedata.field.countAvailablePairs());
+
+        if (ignore) return;
+
+        Texture windowtex = new Texture(Gdx.files.internal("data/gameui/window.png"));
+        windowtex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        final NinePatchDrawable windownp = new NinePatchDrawable(new NinePatch(windowtex, 30, 30, 50, 20));
+
+        final NinePatchDrawable button_up_npd = new NinePatchDrawable(new NinePatch(new Texture(Gdx.files.internal("data/gameui/button-up.png")), 15, 15, 15, 15));
+        final NinePatchDrawable button_down_npd = new NinePatchDrawable(new NinePatch(new Texture(Gdx.files.internal("data/gameui/button-down.png")), 15, 15, 15, 15));
+
+        final TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle(button_up_npd, button_down_npd, button_up_npd, game.fontsHash.get("small"));
+
+        if(gamedata.remainingTiles > 0 && pairs == 0) {
+            Dialog dia = new Dialog("Нет ходов", new WindowStyle(game.fontsHash.get("semi-big"), Color.DARK_GRAY, windownp)) {
+                public void result(Object obj) {
+                    if(obj == (Object)true) {
+                        PlayScreen.gamedata.field.shuffleField();
+                        clearSelection();
+                    }
+                }
+            };
+
+            dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 4F, game.tenth / 2F);
+            dia.text("Больше нет ходов, перемешать поле?\r\nВы можете не перемешивать и отменить последний ход", new Label.LabelStyle(game.fontsHash.get("small"), Color.DARK_GRAY));
+            dia.button("Да", true, tbs);
+            dia.button("Нет", false, tbs);
+
+            dia.show(stage);
+        }
+        if(gamedata.remainingTiles == 0) {
+            saveField();
+
+            Dialog dia = new Dialog("Поздравляем!", new WindowStyle(game.fontsHash.get("semi-big"), Color.DARK_GRAY, windownp)) {
+                public void result(Object obj) {
+                    gamedata.declined = true;
+                    gotoMenu();
+                }
+            };
+
+            dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 4F, game.tenth / 2F);
+            dia.text("Вы успешно справились с фигурой!", new Label.LabelStyle(game.fontsHash.get("small"), Color.DARK_GRAY));
+            dia.button("Назад в меню", true, tbs);
+
+            dia.show(stage);
+        }
     }
 
     public static void rebuildField() {
@@ -341,6 +427,7 @@ public class PlayScreen implements Screen, Serializable {
 
     @Override
     public void dispose() {
+        saveField();
         this.stage.dispose();
         this.stage = null;
     }
