@@ -411,7 +411,6 @@ public class PlayScreen implements Screen, Serializable {
 
     @Override
     public void pause() {
-        saveField();
     }
 
     @Override

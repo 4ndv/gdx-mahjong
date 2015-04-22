@@ -105,6 +105,7 @@ public class TileActor extends Actor implements Serializable {
         PlayScreen.remainLabel.setText("Осталось фишек: " + PlayScreen.gamedata.remainingTiles);
         PlayScreen.recountMoves(false);
         Gdx.audio.newSound(Gdx.files.internal("data/sounds/swosh.ogg")).play();
+        PlayScreen.saveField();
     }
 
     public void glowIt() {
