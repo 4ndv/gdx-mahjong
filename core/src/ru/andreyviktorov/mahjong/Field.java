@@ -138,12 +138,11 @@ public class Field implements Serializable {
     }
 
     public enum Figure {
-        Turtle, TriPeaks
+        Turtle, TriPeaks, Coliseum
     }
 
     public void generateTiles() {
         tiles = new LinkedList();
-        int count = this.tilecount;
         for (Tile.Suit suit : Tile.Suit.values()) {
             // Создаем тайлы для основных мастей
             if(suit == Tile.Suit.Pin || suit == Tile.Suit.Bamboo || suit == Tile.Suit.Man) {
@@ -265,16 +264,20 @@ public class Field implements Serializable {
                 this.width = 30;
                 this.height = 16;
                 this.tilecount = 144;
-                this.generateTiles();
                 break;
             case TriPeaks:
                 this.width = 30;
                 this.height = 14;
                 this.tilecount = 120;
-                this.generateTiles();
+                break;
+            case Coliseum:
+                this.width = 20;
+                this.height = 16;
+                this.tilecount = 136;
                 break;
         }
 
+        this.generateTiles();
         this.generateFigure(fig);
     }
 
@@ -286,6 +289,9 @@ public class Field implements Serializable {
                 break;
             case TriPeaks:
                 ret = 14;
+                break;
+            case Coliseum:
+                ret = 16;
         }
 
         return ret;
@@ -384,6 +390,49 @@ public class Field implements Serializable {
                 tp_four.setAt(22, 6, getOneTileActor());
                 this.addLayer(tp_four);
                 break;
+            case Coliseum:
+                Layer co_first = this.forkLayer();
+                co_first.addLine(4, 0, getNTileActors(6));
+                co_first.addLine(2, 2, getNTileActors(8));
+                co_first.addLine(0, 4, getNTileActors(10));
+                co_first.addLine(0, 6, getNTileActors(3));
+                co_first.addLine(0, 8, getNTileActors(3));
+                co_first.addLine(14, 6, getNTileActors(3));
+                co_first.addLine(14, 8, getNTileActors(3));
+                co_first.addLine(0, 10, getNTileActors(10));
+                co_first.addLine(2, 12, getNTileActors(8));
+                co_first.addLine(4, 14, getNTileActors(6));
+                this.addLayer(co_first);
+                Layer co_second = this.forkLayer();
+                co_second.addLine(4, 0, getNTileActors(6));
+                co_second.addLine(2, 2, getNTileActors(8));
+                co_second.addLine(0, 4, getNTileActors(3));
+                co_second.addLine(14, 4, getNTileActors(3));
+                co_second.addLine(0, 6, getNTileActors(2));
+                co_second.addLine(16, 6, getNTileActors(2));
+                co_second.addLine(0, 8, getNTileActors(2));
+                co_second.addLine(16, 8, getNTileActors(2));
+                co_second.addLine(0, 10, getNTileActors(3));
+                co_second.addLine(14, 10, getNTileActors(3));
+                co_second.addLine(2, 12, getNTileActors(8));
+                co_second.addLine(4, 14, getNTileActors(6));
+                this.addLayer(co_second);
+                Layer co_third = this.forkLayer();
+                co_third.addLine(4, 0, getNTileActors(6));
+                co_third.addLine(2, 2, getNTileActors(2));
+                co_third.addLine(14, 2, getNTileActors(2));
+                co_third.setAt(0, 4, getOneTileActor());
+                co_third.setAt(0, 6, getOneTileActor());
+                co_third.setAt(0, 8, getOneTileActor());
+                co_third.setAt(0, 10, getOneTileActor());
+                co_third.setAt(18, 4, getOneTileActor());
+                co_third.setAt(18, 6, getOneTileActor());
+                co_third.setAt(18, 8, getOneTileActor());
+                co_third.setAt(18, 10, getOneTileActor());
+                co_third.addLine(2, 12, getNTileActors(2));
+                co_third.addLine(14, 12, getNTileActors(2));
+                co_third.addLine(4, 14, getNTileActors(6));
+                this.addLayer(co_third);
         }
     }
 

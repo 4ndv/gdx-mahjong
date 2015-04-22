@@ -26,39 +26,39 @@ public class Mahjong extends Game implements Serializable {
 
 	@Override
 	public void create () {
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/gameui/ObelixPro-cyr.ttf"));
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/gameui/PTN77F.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter param = new FreeTypeFontGenerator.FreeTypeFontParameter();
         BitmapFont font;
 
         this.tenth = Gdx.graphics.getHeight() / 10;
         this.twentyth = Gdx.graphics.getHeight() / 20;
 
-        param.size = Math.round(Gdx.graphics.getHeight() / 22);
+        param.size = Math.round(Gdx.graphics.getHeight() / 20);
         param.characters = FONT_CHARACTERS;
         font = generator.generateFont(param);
         font.setColor(Color.DARK_GRAY);
 
         fontsHash.put("big", font);
 
-        param.size = Math.round(Gdx.graphics.getHeight() / 24);
+        param.size = Math.round(Gdx.graphics.getHeight() / 22);
         font = generator.generateFont(param);
         font.setColor(Color.DARK_GRAY);
 
         fontsHash.put("semi-big", font);
 
-        param.size = Math.round(Gdx.graphics.getHeight() / 30);
+        param.size = Math.round(Gdx.graphics.getHeight() / 24);
         font = generator.generateFont(param);
         font.setColor(Color.DARK_GRAY);
 
         fontsHash.put("medium", font);
 
-        param.size = Math.round(Gdx.graphics.getHeight() / 35);
+        param.size = Math.round(Gdx.graphics.getHeight() / 30);
         font = generator.generateFont(param);
         font.setColor(Color.DARK_GRAY);
 
         fontsHash.put("semi-medium", font);
 
-        param.size = Math.round(Gdx.graphics.getHeight() / 40);
+        param.size = Math.round(Gdx.graphics.getHeight() / 35);
         font = generator.generateFont(param);
         font.setColor(Color.DARK_GRAY);
 

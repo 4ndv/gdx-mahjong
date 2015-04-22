@@ -21,7 +21,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,18 +32,18 @@ public class PlayScreen implements Screen, Serializable {
     public transient static Stage stage;
     public transient static Mahjong game;
 
-    public static float SCALE_RATIO = 128 / Gdx.graphics.getWidth();
     public static float TILE_WIDTH;
     public static float TILE_HEIGHT;
     public static GameData gamedata;
-    public static List<List<Image>> shadows = new ArrayList();
     public static Texture glowtexture;
     public static Image glowimg;
-    public static Image[][][] shadowimgs;
     private static List<String> backgrounds;
 
     public static Group back;
     public static Group fore;
+
+    // Да, более простого способа нет...
+    public static Color labelsColor = new Color((1F/255)*8F, (1F/255)*46F, (1F/255)*65F, 1);
 
     public static Preferences prefs;
 
@@ -70,13 +69,13 @@ public class PlayScreen implements Screen, Serializable {
         game = gameref;
         stage = new Stage(new ScreenViewport());
 
-        if(gamedata == null || gamedata.declined == true) {
+        if(gamedata == null || gamedata.declined) {
             gamedata = new GameData();
 
-            // Генерируем поле с чуть более большим числом доступных ходов изначально, снижая этим процент нерешаемых полей. Из-за высокой нагрузки число обходов ограничено 4-мя, надеемся на благосклонность рандома
+            // Генерируем поле с чуть более большим числом доступных ходов изначально, снижая этим процент нерешаемых полей. Из-за высокой нагрузки число обходов ограничено 2-мя, надеемся на благосклонность рандома
             Field tempfield = null;
             int fieldrecord = 0;
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 2; i++) {
                 Field tmp = new Field(figure);
                 int tmprecord = tmp.countAvailablePairs();
                 if (tmprecord > fieldrecord) {
@@ -124,8 +123,8 @@ public class PlayScreen implements Screen, Serializable {
         }
 
         Label.LabelStyle ls = new Label.LabelStyle();
-        ls.font = game.fontsHash.get("semi-big");
-        ls.fontColor = Color.DARK_GRAY;
+        ls.font = game.fontsHash.get("big");
+        ls.fontColor = labelsColor;
 
         Texture windowtex = new Texture(Gdx.files.internal("data/gameui/window.png"));
         windowtex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -142,9 +141,9 @@ public class PlayScreen implements Screen, Serializable {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if(gamedata.field.countAvailablePairs() > 0) {
-                    Dialog dia = new Dialog("Увы", new WindowStyle(game.fontsHash.get("semi-big"), Color.DARK_GRAY, windownp));
-                    dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 4F, game.tenth / 2F);
-                    dia.text("У вас еще есть доступные ходы", new Label.LabelStyle(game.fontsHash.get("small"), Color.DARK_GRAY));
+                    Dialog dia = new Dialog("Увы", new WindowStyle(game.fontsHash.get("semi-big"), labelsColor, windownp));
+                    dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 2F, game.tenth / 2F);
+                    dia.text("У вас еще есть доступные ходы", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
                     dia.button("OK", true, tbs);
 
                     dia.show(stage);
@@ -159,9 +158,9 @@ public class PlayScreen implements Screen, Serializable {
         helpButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                Dialog dia = new Dialog("Правила игры", new WindowStyle(game.fontsHash.get("semi-big"), Color.DARK_GRAY, windownp));
-                dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 4F, game.tenth / 2F);
-                dia.text("Добро пожаловать в пасьянс маджонг!\r\nКраткие правила игры:\r\nНужно убрать с поля все парные фишки.\r\nФишки делятся на два типа: обычные и джокеры.\r\nДжокеры - это фишки с цифрой в левом верхнем углу,\r\nи убираются опираясь на картинку в центре.\r\n\r\nФишки не могут быть убраны если:\r\n1. Над ней есть другая фишка\r\n2. Слева и справа от нее есть другие фишки", new Label.LabelStyle(game.fontsHash.get("small"), Color.DARK_GRAY));
+                Dialog dia = new Dialog("Правила игры", new WindowStyle(game.fontsHash.get("semi-big"), labelsColor, windownp));
+                dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 2F, game.tenth / 2F);
+                dia.text("Добро пожаловать в пасьянс маджонг!\r\nКраткие правила игры:\r\nНужно убрать с поля все парные фишки.\r\nФишки делятся на два типа: обычные и джокеры.\r\nДжокеры - это фишки с цифрой в левом верхнем углу,\r\nи убираются опираясь на картинку в центре.\r\n\r\nФишки не могут быть убраны если:\r\n1. Над ней есть другая фишка\r\n2. Слева и справа от нее есть другие фишки", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
                 dia.button("OK", true, tbs);
 
                 dia.show(stage);
@@ -197,7 +196,7 @@ public class PlayScreen implements Screen, Serializable {
         surrenderButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                Dialog dia = new Dialog("Сдаться", new WindowStyle(game.fontsHash.get("semi-big"), Color.DARK_GRAY, windownp)) {
+                Dialog dia = new Dialog("Сдаться", new WindowStyle(game.fontsHash.get("semi-big"), labelsColor, windownp)) {
                     public void result(Object obj) {
                         if(obj == (Object)true) {
                             gamedata.remainingTiles = 0;
@@ -207,8 +206,8 @@ public class PlayScreen implements Screen, Serializable {
                     }
                 };
 
-                dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 4F, game.tenth / 2F);
-                dia.text("Вы действительно хотите сдаться?", new Label.LabelStyle(game.fontsHash.get("small"), Color.DARK_GRAY));
+                dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 2F, game.tenth / 2F);
+                dia.text("Вы действительно хотите сдаться?", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
                 dia.button("Да", true, tbs);
                 dia.button("Нет", false, tbs);
 
@@ -249,8 +248,8 @@ public class PlayScreen implements Screen, Serializable {
     }
 
     public void injectGamedata(GameData gd) {
-        this.gamedata = gd;
-        for(Layer l : this.gamedata.field.layers) {
+        gamedata = gd;
+        for(Layer l : gamedata.field.layers) {
             for(TileActor[] taa : l.data) {
                 for(TileActor ta : taa) {
                     if(ta != null) {
@@ -281,10 +280,6 @@ public class PlayScreen implements Screen, Serializable {
         game.setScreen(new MenuScreen(Static.mahjong));
     }
 
-    public void refreshInput() {
-        Gdx.input.setInputProcessor(stage);
-    }
-
     public static void recountMoves(boolean ignore) {
         int pairs = gamedata.field.countAvailablePairs();
         PlayScreen.availableLabel.setText("Возможных ходов: " + gamedata.field.countAvailablePairs());
@@ -301,7 +296,7 @@ public class PlayScreen implements Screen, Serializable {
         final TextButton.TextButtonStyle tbs = new TextButton.TextButtonStyle(button_up_npd, button_down_npd, button_up_npd, game.fontsHash.get("small"));
 
         if(gamedata.remainingTiles > 0 && pairs == 0) {
-            Dialog dia = new Dialog("Нет ходов", new WindowStyle(game.fontsHash.get("semi-big"), Color.DARK_GRAY, windownp)) {
+            Dialog dia = new Dialog("Нет ходов", new WindowStyle(game.fontsHash.get("semi-big"), labelsColor, windownp)) {
                 public void result(Object obj) {
                     if(obj == (Object)true) {
                         PlayScreen.gamedata.field.shuffleField();
@@ -309,9 +304,9 @@ public class PlayScreen implements Screen, Serializable {
                     }
                 }
             };
-
-            dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 4F, game.tenth / 2F);
-            dia.text("Больше нет ходов, перемешать поле?\r\nВы можете не перемешивать и отменить последний ход", new Label.LabelStyle(game.fontsHash.get("small"), Color.DARK_GRAY));
+            
+            dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 2F, game.tenth / 2F);
+            dia.text("Больше нет ходов, перемешать поле?\r\nВы можете не перемешивать и отменить последний ход", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
             dia.button("Да", true, tbs);
             dia.button("Нет", false, tbs);
 
@@ -320,15 +315,15 @@ public class PlayScreen implements Screen, Serializable {
         if(gamedata.remainingTiles == 0) {
             saveField();
 
-            Dialog dia = new Dialog("Поздравляем!", new WindowStyle(game.fontsHash.get("semi-big"), Color.DARK_GRAY, windownp)) {
+            Dialog dia = new Dialog("Поздравляем!", new WindowStyle(game.fontsHash.get("semi-big"), labelsColor, windownp)) {
                 public void result(Object obj) {
                     gamedata.declined = true;
                     gotoMenu();
                 }
             };
 
-            dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 4F, game.tenth / 2F);
-            dia.text("Вы успешно справились с фигурой!", new Label.LabelStyle(game.fontsHash.get("small"), Color.DARK_GRAY));
+            dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 2F, game.tenth / 2F);
+            dia.text("Вы успешно справились с фигурой!", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
             dia.button("Назад в меню", true, tbs);
 
             dia.show(stage);
@@ -348,10 +343,8 @@ public class PlayScreen implements Screen, Serializable {
         float g_offset_one = 0;
         int layernumber = 0;
         List<TileActor> layerPool;
-        List<Image> shadowPool;
         for(Layer layer : gamedata.field.layers) {
             layerPool = new LinkedList();
-            shadowPool = new LinkedList();
             for(int i = 0; i<gamedata.field.getWidth(); i++) {
                 for(int j = gamedata.field.getHeight()-1; j>=0; j--) {
                     if(layer.data[i][j] != null) {
@@ -414,11 +407,11 @@ public class PlayScreen implements Screen, Serializable {
 
     @Override
     public void hide() {
-        this.dispose();
     }
 
     @Override
     public void pause() {
+        saveField();
     }
 
     @Override
@@ -427,8 +420,6 @@ public class PlayScreen implements Screen, Serializable {
 
     @Override
     public void dispose() {
-        saveField();
-        this.stage.dispose();
-        this.stage = null;
+        stage.dispose();
     }
 }

@@ -104,12 +104,14 @@ public class TileActor extends Actor implements Serializable {
         PlayScreen.gamedata.remainingTiles -= 2;
         PlayScreen.remainLabel.setText("Осталось фишек: " + PlayScreen.gamedata.remainingTiles);
         PlayScreen.recountMoves(false);
+        Gdx.audio.newSound(Gdx.files.internal("data/sounds/swosh.ogg")).play();
     }
 
     public void glowIt() {
         Image img = PlayScreen.glowimg;
         img.setSize(PlayScreen.TILE_WIDTH + this.tiledata.offset, PlayScreen.TILE_HEIGHT + this.tiledata.offset);
         img.setPosition(this.tiledata.x - this.tiledata.offset/20, this.tiledata.y + this.tiledata.offset/20);
+        Gdx.audio.newSound(Gdx.files.internal("data/sounds/click.ogg")).play();
     }
 
     @Override
