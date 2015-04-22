@@ -146,7 +146,7 @@ public class MenuScreen implements Screen{
                 Dialog dia = new Dialog("Об игре", new Window.WindowStyle(game.fontsHash.get("semi-big"), labelsColor, windownp));
 
                 dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 2F, game.tenth / 2F);
-                dia.text("Mahjong v1.3 сборка 146\r\nАвтор: Викторов Андрей\r\nСайт: http://andreyviktorov.github.io\r\n\r\nИсходный код распространяется по\r\nлицензии GNU GPL v2 и доступен по адресу:\r\nhttps://github.com/andreyviktorov/gdx-mahjong\r\n", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
+                dia.text("Mahjong v1.3.1 сборка 149\r\nАвтор: Викторов Андрей\r\nСайт: http://andreyviktorov.github.io\r\n\r\nИсходный код распространяется по\r\nлицензии GNU GPL v2 и доступен по адресу:\r\nhttps://github.com/andreyviktorov/gdx-mahjong\r\n ", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
                 dia.button("Закрыть", true, tbs);
 
                 dia.show(stage);
@@ -167,7 +167,7 @@ public class MenuScreen implements Screen{
                 };
 
                 dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 2F, game.tenth / 2F);
-                dia.text("Вы действительно хотите выйти?", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
+                dia.text("Вы действительно хотите выйти?\r\n ", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
                 dia.button("Да", true, tbs);
                 dia.button("Нет", false, tbs);
 

@@ -143,7 +143,7 @@ public class PlayScreen implements Screen, Serializable {
                 if(gamedata.field.countAvailablePairs() > 0) {
                     Dialog dia = new Dialog("Увы", new WindowStyle(game.fontsHash.get("semi-big"), labelsColor, windownp));
                     dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 2F, game.tenth / 2F);
-                    dia.text("У вас еще есть доступные ходы", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
+                    dia.text("У вас еще есть доступные ходы\r\n ", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
                     dia.button("OK", true, tbs);
 
                     dia.show(stage);
@@ -160,7 +160,7 @@ public class PlayScreen implements Screen, Serializable {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 Dialog dia = new Dialog("Правила игры", new WindowStyle(game.fontsHash.get("semi-big"), labelsColor, windownp));
                 dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 2F, game.tenth / 2F);
-                dia.text("Добро пожаловать в пасьянс маджонг!\r\nКраткие правила игры:\r\nНужно убрать с поля все парные фишки.\r\nФишки делятся на два типа: обычные и джокеры.\r\nДжокеры - это фишки с цифрой в левом верхнем углу,\r\nи убираются опираясь на картинку в центре.\r\n\r\nФишки не могут быть убраны если:\r\n1. Над ней есть другая фишка\r\n2. Слева и справа от нее есть другие фишки", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
+                dia.text("Добро пожаловать в пасьянс маджонг!\r\nКраткие правила игры:\r\nНужно убрать с поля все парные фишки.\r\nФишки делятся на два типа: обычные и джокеры.\r\nДжокеры - это фишки с цифрой в левом верхнем углу,\r\nи убираются опираясь на картинку в центре.\r\n\r\nФишки не могут быть убраны если:\r\n1. Над ней есть другая фишка\r\n2. Слева и справа от нее есть другие фишки\r\n ", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
                 dia.button("OK", true, tbs);
 
                 dia.show(stage);
@@ -207,7 +207,7 @@ public class PlayScreen implements Screen, Serializable {
                 };
 
                 dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 2F, game.tenth / 2F);
-                dia.text("Вы действительно хотите сдаться?", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
+                dia.text("Вы действительно хотите сдаться?\r\n ", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
                 dia.button("Да", true, tbs);
                 dia.button("Нет", false, tbs);
 
@@ -306,7 +306,7 @@ public class PlayScreen implements Screen, Serializable {
             };
             
             dia.pad(game.tenth * 1.2F, game.tenth / 2F, game.tenth / 2F, game.tenth / 2F);
-            dia.text("Больше нет ходов, перемешать поле?\r\nВы можете не перемешивать и отменить последний ход", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
+            dia.text("Больше нет ходов, перемешать поле?\r\nВы можете не перемешивать и отменить последний ход\r\n ", new Label.LabelStyle(game.fontsHash.get("small"), labelsColor));
             dia.button("Да", true, tbs);
             dia.button("Нет", false, tbs);
 
