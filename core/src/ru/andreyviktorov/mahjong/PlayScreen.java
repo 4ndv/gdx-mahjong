@@ -45,8 +45,6 @@ public class PlayScreen implements Screen, Serializable {
     // Да, более простого способа нет...
     public static Color labelsColor = new Color((1F/255)*8F, (1F/255)*46F, (1F/255)*65F, 1);
 
-    public static Preferences prefs;
-
     public static TileActor previousOne;
     public static TileActor previousTwo;
 
@@ -55,12 +53,11 @@ public class PlayScreen implements Screen, Serializable {
 
     // Перегруженные конструкторы для использования с
     public PlayScreen (final Mahjong gameref, final Field.Figure figure) {
-        prefs = Gdx.app.getPreferences("leveldata");
         this.load(gameref, figure);
     }
 
     public PlayScreen (final Mahjong gameref, final Field.Figure figure, GameData gd) {
-        prefs = Gdx.app.getPreferences("leveldata");
+        gamedata = null;
         this.injectGamedata(gd);
         this.load(gameref, figure);
     }
@@ -265,6 +262,7 @@ public class PlayScreen implements Screen, Serializable {
     }
 
     public static void saveField() {
+        Preferences prefs = Gdx.app.getPreferences("leveldata");
         if(gamedata.remainingTiles > 0) {
             try {
                 String leveldata = Serializer.toString(gamedata);
@@ -281,6 +279,8 @@ public class PlayScreen implements Screen, Serializable {
 
     public static void gotoMenu() {
         saveField();
+        gamedata = null;
+        stage = null;
         game.setScreen(new MenuScreen(Static.mahjong));
     }
 
