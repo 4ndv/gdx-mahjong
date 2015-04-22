@@ -171,15 +171,7 @@ public class PlayScreen implements Screen, Serializable {
         cancelButton.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if(PlayScreen.previousOne != null && PlayScreen.previousTwo != null) {
-                    PlayScreen.gamedata.field.layers.get(PlayScreen.previousOne.tiledata.layer).data[PlayScreen.previousOne.tiledata.datax][PlayScreen.previousOne.tiledata.datay] = PlayScreen.previousOne;
-                    PlayScreen.gamedata.field.layers.get(PlayScreen.previousTwo.tiledata.layer).data[PlayScreen.previousTwo.tiledata.datax][PlayScreen.previousTwo.tiledata.datay] = PlayScreen.previousTwo;
-                    PlayScreen.previousOne = null;
-                    PlayScreen.previousTwo = null;
-                    rebuildField();
-                    recountMoves(false);
-                    clearSelection();
-                }
+                revertMove();
                 return true;
             }
         });
@@ -245,6 +237,18 @@ public class PlayScreen implements Screen, Serializable {
 
         Gdx.input.setInputProcessor(stage);
         Gdx.input.setCatchBackKey(true);
+    }
+
+    public static void revertMove() {
+        if(PlayScreen.previousOne != null && PlayScreen.previousTwo != null) {
+            PlayScreen.gamedata.field.layers.get(PlayScreen.previousOne.tiledata.layer).data[PlayScreen.previousOne.tiledata.datax][PlayScreen.previousOne.tiledata.datay] = PlayScreen.previousOne;
+            PlayScreen.gamedata.field.layers.get(PlayScreen.previousTwo.tiledata.layer).data[PlayScreen.previousTwo.tiledata.datax][PlayScreen.previousTwo.tiledata.datay] = PlayScreen.previousTwo;
+            PlayScreen.previousOne = null;
+            PlayScreen.previousTwo = null;
+            rebuildField();
+            recountMoves(false);
+            clearSelection();
+        }
     }
 
     public void injectGamedata(GameData gd) {

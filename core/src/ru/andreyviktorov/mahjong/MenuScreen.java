@@ -180,9 +180,6 @@ public class MenuScreen implements Screen{
         bottomTable.add(aboutButton).bottom().pad(5);
         bottomTable.add(exitButton).bottom().pad(5);
 
-        //Label logo = new Label("Mahjong", new Label.LabelStyle(game.fontsHash.get("logo"), labelsColor));
-        //tbl.add(logo).left(); //.padLeft(game.tenth/3).padTop(game.tenth/3);
-
         tbl.row();
         tbl.add(bottomTable).expandX().fillX();
 

@@ -213,6 +213,9 @@ public class Field implements Serializable {
     }
 
     public void shuffleField() {
+        if(this.countAvailablePairs() == 0 && PlayScreen.gamedata.remainingTiles == 2) {
+            PlayScreen.revertMove();
+        }
         do {
             LinkedList<TileActor> newlist = new LinkedList();
             LinkedList<TriPoint> points = new LinkedList();

@@ -6,17 +6,9 @@ Written on Java and libgdx (with lots of hacky hacks) for educational purposes.
 Thanks
 --------
 
-Mahjong Tiles Icons:
+KDE Games (libkmahjongg) for tile icons
 
-[Martin Persson](http://www.martinpersson.org/)
-
-Backgrounds:
-
-1-leaves.jpg [Martin Kanemoto](https://www.flickr.com/photos/kanemoto/)
-
-2-leaves.jpg [Martin Kanemoto](https://www.flickr.com/photos/kanemoto/)
-
-3-leaver.jpg [Martin Kanemoto](https://www.flickr.com/photos/kanemoto/)
+Background authors and subtlepatterns for backgrounds
 
 License
 --------
